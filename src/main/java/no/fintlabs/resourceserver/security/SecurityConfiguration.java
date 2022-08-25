@@ -19,7 +19,6 @@ import java.util.List;
 import static no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil.SOURCE_APPLICATION_ID_PREFIX;
 
 @EnableWebFluxSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
 
     private final ClientJwtConverter clientJwtConverter;
@@ -34,12 +33,6 @@ public class SecurityConfiguration {
     InternalApiSecurityProperties internalApiSecurityProperties() {
         return new InternalApiSecurityProperties();
     }
-
-//    @Bean
-//    @ConfigurationProperties("fint.flyt.resource-server.security.api.admin")
-//    AdminApiSecurityProperties adminApiSecurityProperties() {
-//        return new AdminApiSecurityProperties();
-//    }
 
     @Bean
     @ConfigurationProperties("fint.flyt.resource-server.security.api.external")
@@ -75,48 +68,7 @@ public class SecurityConfiguration {
                 .build();
     }
 
-//    @Order(2)
-//    @Bean
-//    SecurityWebFilterChain adminApiFilterChain(
-//            AdminApiSecurityProperties adminApiSecurityProperties,
-//            ServerHttpSecurity http
-//    ) {
-//        http
-//                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(UrlPaths.ADMIN_API + "/**"))
-//                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
-//
-//        if (adminApiSecurityProperties.isPermitAll()) {
-//            return permitAll(http);
-//        }
-//
-//        return http
-//                .oauth2ResourceServer((resourceServer) -> resourceServer
-//                        .jwt()
-//                        .jwtAuthenticationConverter(new FintJwtUserConverter())
-//                )
-//                .authorizeExchange()
-//                .anyExchange()
-//                .access((Mono<Authentication> authenticationMono, AuthorizationContext object) -> authenticationMono.map(authentication -> {
-//                            Set<String> authorizedOrgIdAuthorities = adminApiSecurityProperties.getAuthorizedOrgIds()
-//                                    .stream()
-//                                    .map(orgId -> "ORGID_" + orgId)
-//                                    .collect(Collectors.toSet());
-//
-//                            Set<String> grantedAuthorities = authentication
-//                                    .getAuthorities()
-//                                    .stream()
-//                                    .map(GrantedAuthority::getAuthority)
-//                                    .collect(Collectors.toSet());
-//
-//                            return !Collections.disjoint(grantedAuthorities, authorizedOrgIdAuthorities)
-//                                    && !(adminApiSecurityProperties.isRequireAdminRole() && !grantedAuthorities.contains("ROLE_admin"));
-//                        }
-//                ).map(AuthorizationDecision::new))
-//                .and()
-//                .build();
-//    }
-
-    @Order(3)
+    @Order(2)
     @Bean
     SecurityWebFilterChain externalApiFilterChain(
             ExternalApiSecurityProperties externalApiSecurityProperties,
@@ -147,7 +99,7 @@ public class SecurityConfiguration {
                 .build();
     }
 
-    @Order(4)
+    @Order(3)
     @Bean
     SecurityWebFilterChain globalFilterChain(
             ServerHttpSecurity http
