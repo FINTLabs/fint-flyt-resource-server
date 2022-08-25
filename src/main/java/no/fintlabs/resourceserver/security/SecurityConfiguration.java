@@ -140,7 +140,7 @@ public class SecurityConfiguration {
                 .authorizeExchange()
                 .anyExchange()
                 .hasAnyAuthority(mapToAuthoritiesArray(
-                        SOURCE_APPLICATION_ID_PREFIX, // TODO: 25/08/2022 Starts with
+                        SOURCE_APPLICATION_ID_PREFIX,
                         externalApiSecurityProperties.getAuthorizedClientIds()
                 ))
                 .and()

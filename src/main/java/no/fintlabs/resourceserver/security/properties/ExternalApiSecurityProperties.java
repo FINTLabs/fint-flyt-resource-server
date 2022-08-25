@@ -9,5 +9,5 @@ import java.util.List;
 public class ExternalApiSecurityProperties {
     private boolean enabled = false;
     private boolean permitAll = false;
-    private List<String> authorizedClientIds = Collections.emptyList(); // TODO: 25/08/2022 Ikke flere clients per cluster?
+    private List<String> authorizedClientIds = Collections.emptyList();
 }
