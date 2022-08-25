@@ -5,6 +5,7 @@ import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.vigoiks.resourceserver.security.FintJwtUserConverter;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
@@ -19,6 +20,7 @@ import java.util.List;
 import static no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil.SOURCE_APPLICATION_ID_PREFIX;
 
 @EnableWebFluxSecurity
+@EnableAutoConfiguration
 public class SecurityConfiguration {
 
     private final ClientJwtConverter clientJwtConverter;
