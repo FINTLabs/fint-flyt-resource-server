@@ -1,4 +1,4 @@
-package no.fintlabs;
+package no.fintlabs.resourceserver;
 
 
 public class UrlPaths {

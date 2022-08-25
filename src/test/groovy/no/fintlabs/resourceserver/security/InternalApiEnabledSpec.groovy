@@ -15,7 +15,7 @@ import spock.lang.Specification
 
 import java.time.Instant
 
-import static no.fintlabs.UrlPaths.INTERNAL_API
+import static no.fintlabs.resourceserver.UrlPaths.INTERNAL_API
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity
 
 @WebFluxTest(controllers = InternalApiTestController.class)

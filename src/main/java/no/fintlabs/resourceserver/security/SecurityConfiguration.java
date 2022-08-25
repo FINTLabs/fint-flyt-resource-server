@@ -1,6 +1,6 @@
 package no.fintlabs.resourceserver.security;
 
-import no.fintlabs.UrlPaths;
+import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
