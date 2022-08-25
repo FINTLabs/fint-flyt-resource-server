@@ -110,7 +110,6 @@ public class SecurityConfiguration {
 
     private SecurityWebFilterChain permitAll(ServerHttpSecurity http) {
         return http
-//                .csrf().disable() // TODO: 22/08/2022 Enable/disable?
                 .authorizeExchange()
                 .anyExchange()
                 .permitAll()
