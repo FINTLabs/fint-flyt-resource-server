@@ -1,0 +1,11 @@
+fint:
+  flyt:
+    resource-server:
+      security:
+        api:
+          internal:
+            enabled: true
+            permit-all: false
+            authorized-org-ids:
+              - example.no
+              - domain.no
