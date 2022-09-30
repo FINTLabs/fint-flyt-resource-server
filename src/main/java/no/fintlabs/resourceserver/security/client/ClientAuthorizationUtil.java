@@ -7,7 +7,7 @@ public class ClientAuthorizationUtil {
 
     public static String SOURCE_APPLICATION_ID_PREFIX = "SOURCE_APPLICATION_ID_";
 
-    public static String getSourceApplicationId(Authentication authentication) {
+    public static Long getSourceApplicationId(Authentication authentication) {
         return authentication
                 .getAuthorities()
                 .stream()
@@ -15,6 +15,7 @@ public class ClientAuthorizationUtil {
                 .filter(authority -> authority.startsWith(SOURCE_APPLICATION_ID_PREFIX))
                 .findFirst()
                 .map(authority -> authority.substring(SOURCE_APPLICATION_ID_PREFIX.length()))
+                .map(Long::parseLong)
                 .orElseThrow();
     }
 }
