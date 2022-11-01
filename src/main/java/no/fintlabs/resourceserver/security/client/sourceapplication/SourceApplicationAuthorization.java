@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.client;
+package no.fintlabs.resourceserver.security.client.sourceapplication;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientAuthorization {
+public class SourceApplicationAuthorization {
     private boolean authorized;
     private String clientId;
     private String sourceApplicationId;

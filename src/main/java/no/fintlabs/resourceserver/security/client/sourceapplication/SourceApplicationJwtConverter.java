@@ -1,5 +1,6 @@
-package no.fintlabs.resourceserver.security.client;
+package no.fintlabs.resourceserver.security.client.sourceapplication;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,13 +12,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ClientJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+public class SourceApplicationJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+
+    private final SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService;
+
+    public SourceApplicationJwtConverter(@Autowired SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService) {
+        this.sourceApplicationAuthorizationRequestService = sourceApplicationAuthorizationRequestService;
+    }
 
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt source) {
         return Mono.fromCallable(
                 () -> Optional.ofNullable(source.<String>getClaim("sub"))
-                        .map(ClientAuthorizationUtil::getAuthority)
+                        .flatMap(sourceApplicationAuthorizationRequestService::getClientAuthorization)
+                        .map(SourceApplicationAuthorizationUtil::getAuthority)
                         .map(grantedAuthority -> new JwtAuthenticationToken(source, List.of(grantedAuthority)))
                         .orElseGet(() -> new JwtAuthenticationToken(source))
         );

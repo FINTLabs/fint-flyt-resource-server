@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.client;
+package no.fintlabs.resourceserver.security.client.sourceapplication;
 
 import no.fintlabs.kafka.common.topic.TopicCleanupPolicyParameters;
 import no.fintlabs.kafka.requestreply.RequestProducer;
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class ClientAuthorizationRequestService {
+public class SourceApplicationAuthorizationRequestService {
 
     private final RequestTopicNameParameters requestTopicNameParameters;
-    private final RequestProducer<String, ClientAuthorization> requestProducer;
+    private final RequestProducer<String, SourceApplicationAuthorization> requestProducer;
 
-    public ClientAuthorizationRequestService(
+    public SourceApplicationAuthorizationRequestService(
             @Value("${fint.kafka.application-id}") String applicationId,
             RequestProducerFactory requestProducerFactory,
             ReplyTopicService replyTopicService
@@ -40,11 +40,11 @@ public class ClientAuthorizationRequestService {
         this.requestProducer = requestProducerFactory.createProducer(
                 replyTopicNameParameters,
                 String.class,
-                ClientAuthorization.class
+                SourceApplicationAuthorization.class
         );
     }
 
-    public Optional<ClientAuthorization> getClientAuthorization(String clientId) {
+    public Optional<SourceApplicationAuthorization> getClientAuthorization(String clientId) {
         return requestProducer.requestAndReceive(
                 RequestProducerRecord
                         .<String>builder()

@@ -1,21 +1,14 @@
 package no.fintlabs.resourceserver.security.client;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class ClientAuthorizationUtil {
 
-    public static String SOURCE_APPLICATION_ID_PREFIX = "SOURCE_APPLICATION_ID_";
+    public static String CLIENT_ID_PREFIX = "CLIENT_ID_";
 
-    public static Long getSourceApplicationId(Authentication authentication) {
-        return authentication
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(authority -> authority.startsWith(SOURCE_APPLICATION_ID_PREFIX))
-                .findFirst()
-                .map(authority -> authority.substring(SOURCE_APPLICATION_ID_PREFIX.length()))
-                .map(Long::parseLong)
-                .orElseThrow();
+    public static GrantedAuthority getAuthority(String sub) {
+        return new SimpleGrantedAuthority(CLIENT_ID_PREFIX + sub);
     }
+
 }

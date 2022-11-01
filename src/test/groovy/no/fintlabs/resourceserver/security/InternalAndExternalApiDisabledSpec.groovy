@@ -1,7 +1,7 @@
 package no.fintlabs.resourceserver.security
 
-import no.fintlabs.resourceserver.security.client.ClientAuthorization
-import no.fintlabs.resourceserver.security.client.ClientAuthorizationRequestService
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorization
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationRequestService
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
@@ -32,7 +32,7 @@ class InternalAndExternalApiDisabledSpec extends Specification {
     private ReactiveJwtDecoder reactiveJwtDecoder = Mock(ReactiveJwtDecoder.class)
 
     @SpringBean
-    ClientAuthorizationRequestService clientAuthorizationRequestService = Mock(ClientAuthorizationRequestService.class)
+    SourceApplicationAuthorizationRequestService clientAuthorizationRequestService = Mock(SourceApplicationAuthorizationRequestService.class)
 
     private final String externalApiUrl = EXTERNAL_API + "/dummy"
     private final String internalApiUrl = INTERNAL_API + "/dummy"
@@ -58,7 +58,7 @@ class InternalAndExternalApiDisabledSpec extends Specification {
 
     private void clientIsAuthorized(String clientId, String sourceApplicationId) {
         clientAuthorizationRequestService.getClientAuthorization(clientId) >> Optional.of(
-                ClientAuthorization
+                SourceApplicationAuthorization
                         .builder()
                         .authorized(true)
                         .clientId(clientId)

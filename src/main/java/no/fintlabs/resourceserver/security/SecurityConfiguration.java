@@ -1,39 +1,40 @@
 package no.fintlabs.resourceserver.security;
 
 import no.fintlabs.resourceserver.UrlPaths;
-import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
+import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
+import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
 import no.vigoiks.resourceserver.security.FintJwtUserConverter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
-
-import java.util.List;
-
-import static no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil.SOURCE_APPLICATION_ID_PREFIX;
+import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
 @EnableAutoConfiguration
 public class SecurityConfiguration {
 
-    private final ClientJwtConverter clientJwtConverter;
-
-    public SecurityConfiguration(ClientJwtConverter clientJwtConverter) {
-        this.clientJwtConverter = clientJwtConverter;
-    }
-
-
     @Bean
     @ConfigurationProperties("fint.flyt.resource-server.security.api.internal")
     InternalApiSecurityProperties internalApiSecurityProperties() {
         return new InternalApiSecurityProperties();
+    }
+
+    @Bean
+    @ConfigurationProperties("fint.flyt.resource-server.security.api.internal-client")
+    InternalClientApiSecurityProperties internalClientApiSecurityProperties() {
+        return new InternalClientApiSecurityProperties();
     }
 
     @Bean
@@ -45,69 +46,80 @@ public class SecurityConfiguration {
     @Order(1)
     @Bean
     SecurityWebFilterChain internalApiFilterChain(
-            InternalApiSecurityProperties internalApiSecurityProperties,
-            ServerHttpSecurity http
+            ServerHttpSecurity http,
+            InternalApiSecurityProperties internalApiSecurityProperties
     ) {
-        http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(UrlPaths.INTERNAL_API + "/**"))
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
-
-        if (!internalApiSecurityProperties.isEnabled()) {
-            return denyAll(http);
-        }
-
-        return internalApiSecurityProperties.isPermitAll()
-                ? permitAll(http)
-                : http
-                .oauth2ResourceServer((resourceServer) -> resourceServer
-                        .jwt()
-                        .jwtAuthenticationConverter(new FintJwtUserConverter())
-                )
-                .authorizeExchange()
-                .anyExchange()
-                .hasAnyAuthority(mapToAuthoritiesArray("ORGID_", internalApiSecurityProperties.getAuthorizedOrgIds()))
-                .and()
-                .build();
+        return createFilterChain(
+                http,
+                UrlPaths.INTERNAL_API + "/**",
+                new FintJwtUserConverter(),
+                internalApiSecurityProperties
+        );
     }
 
     @Order(2)
     @Bean
-    SecurityWebFilterChain externalApiFilterChain(
-            ExternalApiSecurityProperties externalApiSecurityProperties,
-            ServerHttpSecurity http
+    SecurityWebFilterChain internalClientApiFilterChain(
+            ServerHttpSecurity http,
+            InternalClientApiSecurityProperties internalClientApiSecurityProperties,
+            SourceApplicationJwtConverter sourceApplicationJwtConverter
     ) {
-        http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(UrlPaths.EXTERNAL_API + "/**"))
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
-
-        if (!externalApiSecurityProperties.isEnabled()) {
-            return denyAll(http);
-        }
-
-        return externalApiSecurityProperties.isPermitAll()
-                ? permitAll(http)
-                : http
-                .oauth2ResourceServer((resourceServer) -> resourceServer
-                        .jwt()
-                        .jwtAuthenticationConverter(clientJwtConverter)
-                )
-                .authorizeExchange()
-                .anyExchange()
-                .hasAnyAuthority(mapToAuthoritiesArray(
-                        SOURCE_APPLICATION_ID_PREFIX,
-                        externalApiSecurityProperties.getAuthorizedClientIds()
-                ))
-                .and()
-                .build();
+        return createFilterChain(
+                http,
+                UrlPaths.INTERNAL_CLIENT_API + "/**",
+                sourceApplicationJwtConverter,
+                internalClientApiSecurityProperties
+        );
     }
 
     @Order(3)
     @Bean
-    SecurityWebFilterChain globalFilterChain(
-            ServerHttpSecurity http
+    SecurityWebFilterChain externalApiFilterChain(
+            ServerHttpSecurity http,
+            ExternalApiSecurityProperties externalApiSecurityProperties,
+            SourceApplicationJwtConverter sourceApplicationJwtConverter
     ) {
+        return createFilterChain(
+                http,
+                UrlPaths.EXTERNAL_API + "/**",
+                sourceApplicationJwtConverter,
+                externalApiSecurityProperties
+        );
+    }
+
+    @Order(4)
+    @Bean
+    SecurityWebFilterChain globalFilterChain(ServerHttpSecurity http) {
         http.addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
         return denyAll(http);
+    }
+
+    private SecurityWebFilterChain createFilterChain(
+            ServerHttpSecurity http,
+            String path,
+            Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
+            ApiSecurityProperties apiSecurityProperties
+    ) {
+        http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path))
+                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
+
+        if (!apiSecurityProperties.isEnabled()) {
+            return denyAll(http);
+        }
+
+        return apiSecurityProperties.isPermitAll()
+                ? permitAll(http)
+                : http
+                .oauth2ResourceServer((resourceServer) -> resourceServer
+                        .jwt()
+                        .jwtAuthenticationConverter(converter)
+                )
+                .authorizeExchange()
+                .anyExchange()
+                .hasAnyAuthority(apiSecurityProperties.getPermittedAuthorities())
+                .and()
+                .build();
     }
 
     private SecurityWebFilterChain permitAll(ServerHttpSecurity http) {
@@ -126,13 +138,6 @@ public class SecurityConfiguration {
                 .denyAll()
                 .and()
                 .build();
-    }
-
-    private String[] mapToAuthoritiesArray(String prefix, List<String> values) {
-        return values
-                .stream()
-                .map(id -> prefix + id)
-                .toArray(String[]::new);
     }
 
 }

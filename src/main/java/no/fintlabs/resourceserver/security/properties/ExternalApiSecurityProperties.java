@@ -1,13 +1,23 @@
 package no.fintlabs.resourceserver.security.properties;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Collections;
 import java.util.List;
 
-@Data
-public class ExternalApiSecurityProperties {
-    private boolean enabled = false;
-    private boolean permitAll = false;
-    private List<String> authorizedClientIds = Collections.emptyList();
+import static no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationUtil.SOURCE_APPLICATION_ID_PREFIX;
+
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExternalApiSecurityProperties extends ApiSecurityProperties {
+
+    private List<String> authorizedClientIds;
+
+    @Override
+    public String[] getPermittedAuthorities() {
+        return mapToAuthoritiesArray(SOURCE_APPLICATION_ID_PREFIX, authorizedClientIds);
+    }
+
 }
