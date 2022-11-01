@@ -1,6 +1,7 @@
 package no.fintlabs.resourceserver.security;
 
 import no.fintlabs.resourceserver.UrlPaths;
+import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
@@ -62,12 +63,12 @@ public class SecurityConfiguration {
     SecurityWebFilterChain internalClientApiFilterChain(
             ServerHttpSecurity http,
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
-            SourceApplicationJwtConverter sourceApplicationJwtConverter
+            ClientJwtConverter clientJwtConverter
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_CLIENT_API + "/**",
-                sourceApplicationJwtConverter,
+                clientJwtConverter,
                 internalClientApiSecurityProperties
         );
     }
