@@ -17,8 +17,8 @@ public class JwtFactory {
                     claims.put("email", "test@test.com");
                     claims.put("studentnumber", "123456");
                     claims.put("employeeId", "654321");
-                    claims.put("organizationid", "test.com");
-                    claims.put("organizationnumber", "123456789");
+                    claims.put("organizationid", "\"test.com\"");
+                    claims.put("organizationnumber", "\"123456789\"");
                     claims.put("roles", Arrays.asList("role1", "role2", "role3"));
                 })
                 .build();

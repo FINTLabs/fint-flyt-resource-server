@@ -9,10 +9,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
@@ -50,16 +47,34 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
     }
 
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
-        return Flux.fromIterable(this.authoritiesMap.entrySet())
+        Flux<GrantedAuthority> authoritiesFlux = Flux.fromIterable(this.authoritiesMap.entrySet())
                 .filter((claimPrefixEntry) -> jwt.hasClaim(claimPrefixEntry.getKey()))
-                .flatMap((entry) -> this.extractAuthorities(jwt, entry.getKey(), entry.getValue()))
-                .map(this::modifyAuthority)
-                .collectList()
-                .map((authorities) -> new JwtAuthenticationToken(jwt, authorities));
+                .flatMap((entry) -> this.extractAuthorities(jwt, entry.getKey(), entry.getValue()));
+
+        return authoritiesFlux.collectList().flatMap(authorities -> {
+            Map<String, Object> modifiedClaims = new HashMap<>();
+
+            jwt.getClaims().forEach((key, value) -> {
+                modifiedClaims.put(key, modifyClaim(value));
+            });
+
+            modifiedClaims.put("organizationid", modifyClaim(jwt.getClaim("organizationid")));
+            modifiedClaims.put("organizationnumber", modifyClaim(jwt.getClaim("organizationnumber")));
+
+            Jwt modifiedJwt = Jwt.withTokenValue(jwt.getTokenValue())
+                    .headers(h -> h.putAll(jwt.getHeaders()))
+                    .claims(c -> c.putAll(modifiedClaims))
+                    .build();
+
+            return Mono.just(new JwtAuthenticationToken(modifiedJwt, authorities));
+        });
     }
 
-    private GrantedAuthority modifyAuthority(GrantedAuthority auth) {
-        return new SimpleGrantedAuthority(auth.getAuthority().replace("\\", "").replace("\"", ""));
+    private Object modifyClaim(Object claim) {
+        if (claim instanceof String) {
+            return ((String) claim).replace("\\", "").replace("\"", "");
+        }
+        return claim;
     }
 
 }
