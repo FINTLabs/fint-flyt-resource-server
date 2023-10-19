@@ -2,12 +2,12 @@ package no.fintlabs.resourceserver.security;
 
 import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
-import no.vigoiks.resourceserver.security.FintJwtUserConverter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +53,7 @@ public class SecurityConfiguration {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
-                new FintJwtUserConverter(),
+                new FintFlytJwtUserConverter(),
                 internalApiSecurityProperties
         );
     }
