@@ -58,9 +58,6 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
                 modifiedClaims.put(key, modifyClaim(value));
             });
 
-            modifiedClaims.put("organizationid", modifyClaim(jwt.getClaim("organizationid")));
-            modifiedClaims.put("organizationnumber", modifyClaim(jwt.getClaim("organizationnumber")));
-
             Jwt modifiedJwt = Jwt.withTokenValue(jwt.getTokenValue())
                     .headers(h -> h.putAll(jwt.getHeaders()))
                     .claims(c -> c.putAll(modifiedClaims))
