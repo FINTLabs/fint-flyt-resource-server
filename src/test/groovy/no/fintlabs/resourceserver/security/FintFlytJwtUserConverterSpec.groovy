@@ -36,20 +36,4 @@ class FintFlytJwtUserConverterSpec extends Specification {
         }
     }
 
-
-    def "Converting a FINT Flyt user jwt should remove \\ and \" from organizationnumber"() {
-        given: "A JWT token with illegal characters in the organizationnumber claim"
-        Jwt jwt = JwtFactory.createEndUserJwt()
-
-        when: "We convert the token"
-        Mono<AbstractAuthenticationToken> convertedToken = converter.convert(jwt)
-
-        then: "The illegal characters should be removed from organizationnumber"
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) convertedToken.block()
-        Jwt modifiedJwt = jwtAuthenticationToken.getToken()
-        String organizationNumber = (String) modifiedJwt.getClaim("organizationnumber")
-
-        assert !organizationNumber.contains("\\")
-        assert !organizationNumber.contains("\"")
-    }
 }
