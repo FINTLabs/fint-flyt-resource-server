@@ -6,7 +6,7 @@ fint:
           internal:
             enabled: true
             permit-all: false
-            authorized-orgid-role-pairs:
+            authorized-org-id-role-pairs:
               example.no:
                 - admin
               domain.no:
