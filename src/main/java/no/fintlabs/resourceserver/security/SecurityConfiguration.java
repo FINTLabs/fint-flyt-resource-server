@@ -1,5 +1,6 @@
 package no.fintlabs.resourceserver.security;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
 @EnableAutoConfiguration
+@Slf4j
 public class SecurityConfiguration {
 
     @Bean
@@ -50,6 +52,7 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             InternalApiSecurityProperties internalApiSecurityProperties
     ) {
+        log.debug("Internal API Security Properties: {}", (Object) internalApiSecurityProperties.getPermittedAuthorities());
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",

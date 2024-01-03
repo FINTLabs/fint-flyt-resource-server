@@ -6,17 +6,20 @@ import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class InternalApiSecurityProperties extends ApiSecurityProperties {
 
-    private List<String> authorizedOrgIds = Collections.emptyList();
+    private Map<String, List<String>> authorizedOrgIdRolePairs = Collections.emptyMap();
 
     @Override
     public String[] getPermittedAuthorities() {
-        return mapToAuthoritiesArray("ORGID_", authorizedOrgIds);
+        return authorizedOrgIdRolePairs.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(role -> "ORGID_" + entry.getKey() + "_ROLE_" + role))
+                .toArray(String[]::new);
     }
-
 }
