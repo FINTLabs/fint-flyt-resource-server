@@ -22,6 +22,9 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
         String organizationId = jwt.getClaimAsString("organizationid");
         List<String> roles = jwt.getClaimAsStringList("roles");
 
+        log.debug("Extracted organization ID from JWT: {}", organizationId);
+        log.debug("Extracted roles from JWT: {}", roles);
+
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         if (organizationId != null && roles != null) {
