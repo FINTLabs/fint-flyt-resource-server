@@ -85,7 +85,7 @@ class InternalAndExternalApiEnabledSpec extends Specification {
         responseSpec.expectStatus().isOk()
     }
 
-    private void tokenContainsOrgId(String orgId) {
+    private void tokenContainsOrgIdAndRoles(String orgId, List<String> roles) {
         reactiveJwtDecoder.decode(jwtString) >> Mono.just(new Jwt(
                 jwtString,
                 Instant.now(),
@@ -94,14 +94,14 @@ class InternalAndExternalApiEnabledSpec extends Specification {
                 Map.of(
                         "organizationid", orgId,
                         "organizationnumber", "organizationNumber",
-                        "roles", []
+                        "roles", roles
                 )
         ))
     }
 
-    def 'given_token_with_orgId_that_is_authorized_the_request_should_return_ok'() {
+    def 'given_token_with_orgId_and_role_that_is_authorized_the_request_should_return_ok'() {
         given:
-        tokenContainsOrgId("example.no")
+        tokenContainsOrgIdAndRoles("example.no", ["admin"])
 
         when:
         WebTestClient.ResponseSpec responseSpec = webTestClient

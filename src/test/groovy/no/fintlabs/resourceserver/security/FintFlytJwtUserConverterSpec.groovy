@@ -12,12 +12,12 @@ class FintFlytJwtUserConverterSpec extends Specification {
 
     FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter()
 
-    def "Converting a FINT user JWT should result in 5 authorities"() {
+    def "Converting a FINT user JWT should result in 3 authorities"() {
         when:
         def authenticationToken = converter.convert(JwtFactory.createEndUserJwt()).block()
 
         then:
-        authenticationToken.getAuthorities().size() == 5
+        authenticationToken.getAuthorities().size() == 3
     }
 
     def "Converting a FINT Flyt user jwt should remove \\ and \" from claims"() {

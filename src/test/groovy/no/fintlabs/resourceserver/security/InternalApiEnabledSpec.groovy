@@ -46,7 +46,7 @@ class InternalApiEnabledSpec extends Specification {
                 .build()
     }
 
-    private void tokenContainsOrgId(String orgId) {
+    private void tokenContainsOrgIdAndRoles(String orgId, List<String> roles) {
         reactiveJwtDecoder.decode(jwtString) >> Mono.just(new Jwt(
                 jwtString,
                 Instant.now(),
@@ -55,7 +55,7 @@ class InternalApiEnabledSpec extends Specification {
                 Map.of(
                         "organizationid", orgId,
                         "organizationnumber", "organizationNumber",
-                        "roles", []
+                        "roles", roles
                 )
         ))
     }
@@ -96,9 +96,39 @@ class InternalApiEnabledSpec extends Specification {
         responseSpec.expectStatus().isForbidden()
     }
 
-    def 'given_token_with_orgId_that_is_not_authorized_should_return_forbidden'() {
+    def 'given_token_with_orgId_and_role_that_is_authorized_the_request_should_return_ok'() {
         given:
-        tokenContainsOrgId("other.no")
+        tokenContainsOrgIdAndRoles("example.no", ["admin"])
+
+        when:
+        WebTestClient.ResponseSpec responseSpec = webTestClient
+                .get()
+                .uri(internalApiUrl)
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+
+        then:
+        responseSpec.expectStatus().isOk()
+    }
+
+    def 'given_token_with_orgId_and_multiple_roles_where_at_least_one_is_authorized_the_request_should_return_ok'() {
+        given:
+        tokenContainsOrgIdAndRoles("example.no", ["admin", "user"])
+
+        when:
+        WebTestClient.ResponseSpec responseSpec = webTestClient
+                .get()
+                .uri(internalApiUrl)
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+
+        then:
+        responseSpec.expectStatus().isOk()
+    }
+
+    def 'given_token_with_orgId_and_role_that_is_not_authorized_the_request_should_return_forbidden'() {
+        given:
+        tokenContainsOrgIdAndRoles("example.no", ["user"])
 
         when:
         WebTestClient.ResponseSpec responseSpec = webTestClient
@@ -111,9 +141,9 @@ class InternalApiEnabledSpec extends Specification {
         responseSpec.expectStatus().isForbidden()
     }
 
-    def 'given_token_with_orgId_that_is_authorized_the_request_should_return_ok'() {
+    def 'given_token_without_roles_should_return_forbidden'() {
         given:
-        tokenContainsOrgId("example.no")
+        tokenContainsOrgIdAndRoles("example.no", [])
 
         when:
         WebTestClient.ResponseSpec responseSpec = webTestClient
@@ -123,7 +153,7 @@ class InternalApiEnabledSpec extends Specification {
                 .exchange()
 
         then:
-        responseSpec.expectStatus().isOk()
+        responseSpec.expectStatus().isForbidden()
     }
 
 }
