@@ -1,16 +1,21 @@
 package no.fintlabs.resourceserver.security
 
 import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter
+import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties
 import no.fintlabs.resourceserver.testutils.JwtFactory
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import reactor.core.publisher.Mono
+import spock.lang.Shared
 import spock.lang.Specification
 
 class FintFlytJwtUserConverterSpec extends Specification {
 
-    FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter()
+    @Shared
+    InternalApiSecurityProperties properties = Mock()
+    @Shared
+    FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter(properties)
 
     def "Converting a FINT user JWT should result in 3 authorities"() {
         when:
