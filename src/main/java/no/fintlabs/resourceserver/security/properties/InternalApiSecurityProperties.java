@@ -3,6 +3,7 @@ package no.fintlabs.resourceserver.security.properties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
 public class InternalApiSecurityProperties extends ApiSecurityProperties {
 
     private String authorizedOrgIdRolePairsJson = "{}";
+    private String adminRole = "";
 
     private Map<String, List<String>> authorizedOrgIdRolePairs = Collections.emptyMap();
 

@@ -1,6 +1,7 @@
 package no.fintlabs.resourceserver.security.client;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,12 +18,17 @@ import java.util.Map;
 @Slf4j
 public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    private static final String DEVELOPER_ROLE_URL = "https://role-catalog.vigoiks.no/vigo/flyt/developer";
+    private final InternalApiSecurityProperties securityProperties;
+
+    public FintFlytJwtUserConverter(InternalApiSecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
 
         String organizationId = jwt.getClaimAsString("organizationid");
         List<String> roles = jwt.getClaimAsStringList("roles");
+        String adminRole = securityProperties.getAdminRole();
 
         log.debug("Extracted organization ID from JWT: {}", organizationId);
         log.debug("Extracted roles from JWT: {}", roles);
@@ -31,10 +37,12 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
 
         if (organizationId != null && roles != null) {
 
-            boolean isAdmin = roles.contains(DEVELOPER_ROLE_URL);
+            if (adminRole != null && !adminRole.isBlank()) {
+                boolean isAdmin = roles.contains(adminRole);
 
-            if (isAdmin) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                if (isAdmin) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                }
             }
 
             for (String role : roles) {
