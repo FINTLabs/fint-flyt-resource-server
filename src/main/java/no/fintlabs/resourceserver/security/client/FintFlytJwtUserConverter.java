@@ -17,6 +17,8 @@ import java.util.Map;
 @Slf4j
 public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
+    private static final String DEVELOPER_ROLE_URL = "https://role-catalog.vigoiks.no/vigo/flyt/developer";
+
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
 
         String organizationId = jwt.getClaimAsString("organizationid");
@@ -28,6 +30,13 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         if (organizationId != null && roles != null) {
+
+            boolean isAdmin = roles.contains(DEVELOPER_ROLE_URL);
+
+            if (isAdmin) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            }
+
             for (String role : roles) {
                 authorities.add(new SimpleGrantedAuthority("ORGID_" + organizationId + "_ROLE_" + role));
             }
