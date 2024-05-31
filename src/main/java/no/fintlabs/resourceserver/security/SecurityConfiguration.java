@@ -56,7 +56,7 @@ public class SecurityConfiguration {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
-                new FintFlytJwtUserConverter(),
+                new FintFlytJwtUserConverter(internalApiSecurityProperties),
                 internalApiSecurityProperties
         );
     }
