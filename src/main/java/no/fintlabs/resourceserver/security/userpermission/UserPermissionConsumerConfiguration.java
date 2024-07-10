@@ -1,5 +1,6 @@
 package no.fintlabs.resourceserver.security.userpermission;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
@@ -16,6 +17,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
                 UserPermissionCacheConfiguration.class
         }
 )
+@Slf4j
 public class UserPermissionConsumerConfiguration {
     private final EntityConsumerFactoryService entityConsumerFactoryService;
     private final FintCache<String, UserPermission> userPermissionCache;
@@ -33,10 +35,13 @@ public class UserPermissionConsumerConfiguration {
         return entityConsumerFactoryService.createBatchConsumerFactory(
                 UserPermission.class,
                 consumerRecords -> consumerRecords
-                        .forEach(consumerRecord -> userPermissionCache.put(
-                                consumerRecord.key(),
-                                consumerRecord.value()
-                        ))
+                        .forEach(consumerRecord -> {
+                            log.info("consuming userpermission: {} {}", consumerRecord.key(), consumerRecord.value());
+                            userPermissionCache.put(
+                                    consumerRecord.key(),
+                                    consumerRecord.value()
+                            );
+                        })
         ).createContainer(EntityTopicNameParameters.builder().resource("userpermission").build());
     }
 

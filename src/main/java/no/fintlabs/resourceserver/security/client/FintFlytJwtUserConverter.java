@@ -1,7 +1,9 @@
 package no.fintlabs.resourceserver.security.client;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.cache.FintCache;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
+import no.fintlabs.resourceserver.security.userpermission.UserPermission;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,19 +21,26 @@ import java.util.Map;
 public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
     private final InternalApiSecurityProperties securityProperties;
+    private final FintCache<String, UserPermission> userPermissionCache;
 
-    public FintFlytJwtUserConverter(InternalApiSecurityProperties securityProperties) {
+    public FintFlytJwtUserConverter(
+            InternalApiSecurityProperties securityProperties,
+            FintCache<String, UserPermission> userPermissionCache
+    ) {
         this.securityProperties = securityProperties;
+        this.userPermissionCache = userPermissionCache;
     }
 
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
 
         String organizationId = jwt.getClaimAsString("organizationid");
+        String objectIdentifier = jwt.getClaimAsString("objectidentifier");
         List<String> roles = jwt.getClaimAsStringList("roles");
         String adminRole = securityProperties.getAdminRole();
 
         log.debug("Extracted organization ID from JWT: {}", organizationId);
         log.debug("Extracted roles from JWT: {}", roles);
+        log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifier);
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
@@ -48,6 +57,21 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
             for (String role : roles) {
                 authorities.add(new SimpleGrantedAuthority("ORGID_" + organizationId + "_ROLE_" + role));
             }
+        }
+
+        if (objectIdentifier != null) {
+            userPermissionCache.getOptional(objectIdentifier).ifPresent(
+                    userPermission -> {
+                        List<Long> sourceApplicationIds = userPermission.getSourceApplicationIds();
+                        log.info("Fetched sourceApplicationIds from cache: {} for user with objectIdentifier {}",
+                                sourceApplicationIds,
+                                objectIdentifier
+                        );
+                        sourceApplicationIds.forEach(sourceApplicationId ->
+                                authorities.add(new SimpleGrantedAuthority("SOURCE_APP_ID_" + sourceApplicationId))
+                        );
+                    }
+            );
         }
 
         Map<String, Object> modifiedClaims = new HashMap<>();

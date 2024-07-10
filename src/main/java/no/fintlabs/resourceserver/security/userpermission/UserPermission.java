@@ -1,5 +1,7 @@
 package no.fintlabs.resourceserver.security.userpermission;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,4 +13,11 @@ import java.util.UUID;
 public class UserPermission {
     private UUID objectIdentifier;
     private List<Long> sourceApplicationIds;
+
+    @JsonCreator
+    public UserPermission(@JsonProperty("objectIdentifier") UUID objectIdentifier,
+                          @JsonProperty("sourceApplicationIds") List<Long> sourceApplicationIds) {
+        this.objectIdentifier = objectIdentifier;
+        this.sourceApplicationIds = sourceApplicationIds;
+    }
 }

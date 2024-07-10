@@ -1,6 +1,8 @@
 package no.fintlabs.resourceserver.security;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.cache.FintCache;
+import no.fintlabs.cache.FintCacheConfiguration;
 import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter;
@@ -9,9 +11,11 @@ import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
+import no.fintlabs.resourceserver.security.userpermission.UserPermission;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -25,8 +29,15 @@ import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
 @EnableAutoConfiguration
+@Import(FintCacheConfiguration.class)
 @Slf4j
 public class SecurityConfiguration {
+
+    private final FintCache<String, UserPermission> userPermissionCache;
+
+    public SecurityConfiguration(FintCache<String, UserPermission> userPermissionCache) {
+        this.userPermissionCache = userPermissionCache;
+    }
 
     @Bean
     @ConfigurationProperties("fint.flyt.resource-server.security.api.internal")
@@ -56,7 +67,7 @@ public class SecurityConfiguration {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
-                new FintFlytJwtUserConverter(internalApiSecurityProperties),
+                new FintFlytJwtUserConverter(internalApiSecurityProperties, this.userPermissionCache),
                 internalApiSecurityProperties
         );
     }
