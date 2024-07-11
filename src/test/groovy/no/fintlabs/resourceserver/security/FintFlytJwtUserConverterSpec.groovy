@@ -2,6 +2,7 @@ package no.fintlabs.resourceserver.security
 
 import no.fintlabs.cache.FintCache
 import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter
+import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverterService
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties
 import no.fintlabs.resourceserver.security.userpermission.UserPermission
 import no.fintlabs.resourceserver.testutils.JwtFactory
@@ -17,9 +18,9 @@ class FintFlytJwtUserConverterSpec extends Specification {
     @Shared
     InternalApiSecurityProperties properties = Mock()
     @Shared
-    FintCache<String, UserPermission> userPermissionCache = Mock()
+    FintFlytJwtUserConverterService fintFlytJwtUserConverterService = Mock()
     @Shared
-    FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter(properties, userPermissionCache)
+    FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter(properties, fintFlytJwtUserConverterService)
 
     def "Converting a FINT user JWT should result in 3 authorities"() {
         when:

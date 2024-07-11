@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -31,12 +32,13 @@ public class UserPermissionConsumerConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(value = "fint.flyt.resource-server.user-permissions-consumer.enabled", havingValue = "true", matchIfMissing = true)
     ConcurrentMessageListenerContainer<String, UserPermission> createCacheConsumer() {
         return entityConsumerFactoryService.createBatchConsumerFactory(
                 UserPermission.class,
                 consumerRecords -> consumerRecords
                         .forEach(consumerRecord -> {
-                            log.info("consuming userpermission: {} {}", consumerRecord.key(), consumerRecord.value());
+                            log.info("Consuming userpermission: {} {}", consumerRecord.key(), consumerRecord.value().getSourceApplicationIds());
                             userPermissionCache.put(
                                     consumerRecord.key(),
                                     consumerRecord.value()
