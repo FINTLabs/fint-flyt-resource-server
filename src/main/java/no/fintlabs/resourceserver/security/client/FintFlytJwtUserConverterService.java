@@ -31,6 +31,10 @@ public class FintFlytJwtUserConverterService {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String sourceApplicationIds = jwt.getClaimAsString("sourceApplicationIds");
 
+        if (sourceApplicationIds.isEmpty() || sourceApplicationIds.isBlank()) {
+            return List.of();
+        }
+
         return Arrays.stream(sourceApplicationIds.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
