@@ -38,7 +38,11 @@ public class UserPermissionConsumerConfiguration {
                 UserPermission.class,
                 consumerRecords -> consumerRecords
                         .forEach(consumerRecord -> {
-                            log.info("Consuming userpermission: {} {}", consumerRecord.key(), consumerRecord.value().getSourceApplicationIds());
+                            log.info(
+                                    "Consuming userpermission: {} {}",
+                                    consumerRecord.key(),
+                                    consumerRecord.value().getSourceApplicationIds()
+                            );
                             userPermissionCache.put(
                                     consumerRecord.key(),
                                     consumerRecord.value()
