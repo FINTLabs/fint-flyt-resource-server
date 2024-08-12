@@ -3,7 +3,7 @@ package no.fintlabs.resourceserver;
 import no.fintlabs.resourceserver.security.SecurityConfiguration;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
-import no.fintlabs.resourceserver.security.userpermission.UserPermissionConsumerConfiguration;
+import no.fintlabs.resourceserver.security.user.userpermission.UserPermissionConsumerConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

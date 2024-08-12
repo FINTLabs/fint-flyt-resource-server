@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCacheConfiguration;
 import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
-import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter;
-import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverterService;
+import no.fintlabs.resourceserver.security.user.UserJwtConverter;
+import no.fintlabs.resourceserver.security.user.UserClaimFormattingService;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
@@ -32,10 +32,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SecurityConfiguration {
 
-    private final FintFlytJwtUserConverterService fintFlytJwtUserConverterService;
+    private final UserClaimFormattingService userClaimFormattingService;
 
-    public SecurityConfiguration(FintFlytJwtUserConverterService fintFlytJwtUserConverterService) {
-        this.fintFlytJwtUserConverterService = fintFlytJwtUserConverterService;
+    public SecurityConfiguration(UserClaimFormattingService userClaimFormattingService) {
+        this.userClaimFormattingService = userClaimFormattingService;
     }
 
     @Bean
@@ -66,7 +66,7 @@ public class SecurityConfiguration {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
-                new FintFlytJwtUserConverter(internalApiSecurityProperties, this.fintFlytJwtUserConverterService),
+                new UserJwtConverter(internalApiSecurityProperties, this.userClaimFormattingService),
                 internalApiSecurityProperties
         );
     }

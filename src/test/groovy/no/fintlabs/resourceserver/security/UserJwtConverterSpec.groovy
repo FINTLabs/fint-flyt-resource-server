@@ -1,10 +1,9 @@
 package no.fintlabs.resourceserver.security
 
-import no.fintlabs.cache.FintCache
-import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverter
-import no.fintlabs.resourceserver.security.client.FintFlytJwtUserConverterService
+
+import no.fintlabs.resourceserver.security.user.UserJwtConverter
+import no.fintlabs.resourceserver.security.user.UserClaimFormattingService
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties
-import no.fintlabs.resourceserver.security.userpermission.UserPermission
 import no.fintlabs.resourceserver.testutils.JwtFactory
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.oauth2.jwt.Jwt
@@ -13,14 +12,14 @@ import reactor.core.publisher.Mono
 import spock.lang.Shared
 import spock.lang.Specification
 
-class FintFlytJwtUserConverterSpec extends Specification {
+class UserJwtConverterSpec extends Specification {
 
     @Shared
     InternalApiSecurityProperties properties = Mock()
     @Shared
-    FintFlytJwtUserConverterService fintFlytJwtUserConverterService = Mock()
+    UserClaimFormattingService userClaimFormattingService = Mock()
     @Shared
-    FintFlytJwtUserConverter converter = new FintFlytJwtUserConverter(properties, fintFlytJwtUserConverterService)
+    UserJwtConverter converter = new UserJwtConverter(properties, userClaimFormattingService)
 
     def "Converting a FINT user JWT should result in 3 authorities"() {
         when:

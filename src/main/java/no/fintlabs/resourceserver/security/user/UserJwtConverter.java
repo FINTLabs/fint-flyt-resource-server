@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.client;
+package no.fintlabs.resourceserver.security.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,17 +11,18 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import reactor.core.publisher.Mono;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
-public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
     private final InternalApiSecurityProperties securityProperties;
-    private final FintFlytJwtUserConverterService fintFlytJwtUserConverterService;
+    private final UserClaimFormattingService userClaimFormattingService;
 
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
         String organizationId = jwt.getClaimAsString("organizationid");
@@ -33,9 +34,22 @@ public class FintFlytJwtUserConverter implements Converter<Jwt, Mono<AbstractAut
         log.debug("Extracted roles from JWT: {}", roles);
         log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifier);
 
-        Map<String, Object> modifiedClaims = new HashMap<>();
-        jwt.getClaims().forEach((key, value) -> modifiedClaims.put(key, fintFlytJwtUserConverterService.modifyClaim(value)));
-        String sourceApplicationIdsString = fintFlytJwtUserConverterService.convertSourceApplicationIdsIntoString(objectIdentifier);
+        Map<String, Object> modifiedClaims = jwt.getClaims()
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getValue() instanceof String ?
+                        new AbstractMap.SimpleEntry<>(
+                                entry.getKey(),
+                                userClaimFormattingService.removeDoubleQuotesFromClaim((String) entry.getValue())
+                        )
+                        : entry
+                )
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+        String sourceApplicationIdsString = userClaimFormattingService.convertSourceApplicationIdsIntoString(objectIdentifier);
         modifiedClaims.put("sourceApplicationIds", sourceApplicationIdsString);
 
         Jwt modifiedJwt = Jwt.withTokenValue(jwt.getTokenValue())

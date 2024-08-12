@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.userpermission;
+package no.fintlabs.resourceserver.security.user.userpermission;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCache;

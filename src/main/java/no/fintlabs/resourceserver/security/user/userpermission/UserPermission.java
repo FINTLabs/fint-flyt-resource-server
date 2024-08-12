@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.userpermission;
+package no.fintlabs.resourceserver.security.user.userpermission;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.security.userpermission;
+package no.fintlabs.resourceserver.security.user.userpermission;
 
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheConfiguration;
