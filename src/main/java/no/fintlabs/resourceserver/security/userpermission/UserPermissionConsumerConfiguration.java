@@ -32,7 +32,7 @@ public class UserPermissionConsumerConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "fint.flyt.resource-server.user-permissions-consumer.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(value = "fint.flyt.resource-server.user-permissions-consumer.enabled", havingValue = "true")
     ConcurrentMessageListenerContainer<String, UserPermission> createCacheConsumer() {
         return entityConsumerFactoryService.createBatchConsumerFactory(
                 UserPermission.class,
