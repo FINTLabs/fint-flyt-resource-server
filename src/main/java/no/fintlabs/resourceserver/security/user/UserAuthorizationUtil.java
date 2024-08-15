@@ -28,20 +28,17 @@ public class UserAuthorizationUtil {
     }
 
     public static void checkIfUserHasAccessToSourceApplication(
-            boolean userPermissionsConsumerEnabled,
             Authentication authentication,
             Long sourceApplicationId
     ) {
-        if (userPermissionsConsumerEnabled) {
-            List<Long> allowedSourceApplicationIds =
-                    convertSourceApplicationIdsStringToList(authentication);
+        List<Long> allowedSourceApplicationIds =
+                convertSourceApplicationIdsStringToList(authentication);
 
-            if (!allowedSourceApplicationIds.contains(sourceApplicationId)) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "You do not have permission to access or modify data that is related to source application with id=" + sourceApplicationId
-                );
-            }
+        if (!allowedSourceApplicationIds.contains(sourceApplicationId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You do not have permission to access or modify data that is related to source application with id=" + sourceApplicationId
+            );
         }
     }
 
