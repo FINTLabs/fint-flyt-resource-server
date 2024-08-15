@@ -14,9 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAuthorizationUtil {
 
-    boolean userPermissionsConsumerEnabled;
-
-    private static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
+    public static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String sourceApplicationIds = jwt.getClaimAsString("sourceApplicationIds");
 
@@ -30,20 +28,17 @@ public class UserAuthorizationUtil {
     }
 
     public static void checkIfUserHasAccessToSourceApplication(
-            boolean userPermissionsConsumerEnabled,
             Authentication authentication,
             Long sourceApplicationId
     ) {
-        if (userPermissionsConsumerEnabled) {
-            List<Long> allowedSourceApplicationIds =
-                    convertSourceApplicationIdsStringToList(authentication);
+        List<Long> allowedSourceApplicationIds =
+                convertSourceApplicationIdsStringToList(authentication);
 
-            if (!allowedSourceApplicationIds.contains(sourceApplicationId)) {
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "You do not have permission to access data for source application with id=" + sourceApplicationId
-                );
-            }
+        if (!allowedSourceApplicationIds.contains(sourceApplicationId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You do not have permission to access or modify data that is related to source application with id=" + sourceApplicationId
+            );
         }
     }
 
