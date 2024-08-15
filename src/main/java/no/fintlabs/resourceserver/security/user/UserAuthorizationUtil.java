@@ -16,7 +16,7 @@ public class UserAuthorizationUtil {
 
     boolean userPermissionsConsumerEnabled;
 
-    private static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
+    public static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String sourceApplicationIds = jwt.getClaimAsString("sourceApplicationIds");
 
