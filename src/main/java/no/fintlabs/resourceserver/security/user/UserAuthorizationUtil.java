@@ -1,23 +1,22 @@
 package no.fintlabs.resourceserver.security.user;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
-@AllArgsConstructor
-public class UserAuthorizationService {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class UserAuthorizationUtil {
 
     boolean userPermissionsConsumerEnabled;
 
-    private List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
+    private static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String sourceApplicationIds = jwt.getClaimAsString("sourceApplicationIds");
 
@@ -30,7 +29,8 @@ public class UserAuthorizationService {
                 .collect(Collectors.toList());
     }
 
-    public void checkIfUserHasAccessToSourceApplication(
+    public static void checkIfUserHasAccessToSourceApplication(
+            boolean userPermissionsConsumerEnabled,
             Authentication authentication,
             Long sourceApplicationId
     ) {
