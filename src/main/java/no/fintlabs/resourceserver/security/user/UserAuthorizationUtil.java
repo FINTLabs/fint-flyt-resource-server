@@ -41,7 +41,7 @@ public class UserAuthorizationUtil {
             if (!allowedSourceApplicationIds.contains(sourceApplicationId)) {
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN,
-                        "You do not have permission to access metadata for source application with id=" + sourceApplicationId
+                        "You do not have permission to access data for source application with id=" + sourceApplicationId
                 );
             }
         }
