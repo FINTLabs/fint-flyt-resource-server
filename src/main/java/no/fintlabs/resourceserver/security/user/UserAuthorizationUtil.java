@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAuthorizationUtil {
 
-    boolean userPermissionsConsumerEnabled;
-
     public static List<Long> convertSourceApplicationIdsStringToList(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String sourceApplicationIds = jwt.getClaimAsString("sourceApplicationIds");
