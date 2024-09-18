@@ -3,18 +3,20 @@ package no.fintlabs.resourceserver.security.client.sourceapplication;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
-public class SourceApplicationAuthorizationUtil {
+@Service
+public class SourceApplicationAuthorizationService {
 
     public static String SOURCE_APPLICATION_ID_PREFIX = "SOURCE_APPLICATION_ID_";
 
-    public static GrantedAuthority getAuthority(SourceApplicationAuthorization sourceApplicationAuthorization) {
+    public GrantedAuthority getAuthority(SourceApplicationAuthorization sourceApplicationAuthorization) {
         return new SimpleGrantedAuthority(
                 SOURCE_APPLICATION_ID_PREFIX + sourceApplicationAuthorization.getSourceApplicationId()
         );
     }
 
-    public static Long getSourceApplicationId(Authentication authentication) {
+    public Long getSourceApplicationId(Authentication authentication) {
         return authentication
                 .getAuthorities()
                 .stream()
