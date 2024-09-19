@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-import static no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationUtil.SOURCE_APPLICATION_ID_PREFIX;
+import static no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationService.SOURCE_APPLICATION_ID_PREFIX;
 
 @Setter
 @AllArgsConstructor
