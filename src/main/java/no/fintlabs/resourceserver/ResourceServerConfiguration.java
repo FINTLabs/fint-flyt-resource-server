@@ -18,8 +18,9 @@ public class ResourceServerConfiguration {
     private Long defaultCacheHeapSize;
 
     @Bean
-    public void configureDefaults() {
+    public Boolean configureDefaults() {
         System.setProperty("fint.cache.defaultCacheEntryTimeToLiveMillis", String.valueOf(defaultCacheEntryTimeToLiveMillis));
         System.setProperty("fint.cache.defaultCacheHeapSize", String.valueOf(defaultCacheHeapSize));
+        return true;
     }
 }
