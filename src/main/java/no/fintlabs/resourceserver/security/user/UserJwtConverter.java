@@ -68,7 +68,9 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
                 }
             }
             for (String role : roles) {
-                authorities.add(new SimpleGrantedAuthority("ORGID_" + organizationId + "_ROLE_" + role));
+                String orgIdAndRoleGrantedAuthorityString = "ORGID_" + organizationId + "_ROLE_" + role;
+                log.debug("orgIdAndRoleGrantedAuthorityString: {}", orgIdAndRoleGrantedAuthorityString);
+                authorities.add(new SimpleGrantedAuthority(orgIdAndRoleGrantedAuthorityString));
             }
         }
         return Mono.just(new JwtAuthenticationToken(modifiedJwt, authorities));
