@@ -30,9 +30,8 @@ public class InternalApiSecurityProperties extends ApiSecurityProperties {
     public void parseAndSetAuthorizedOrgIdRolePairs() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            this.authorizedOrgIdRolePairs = mapper.readValue(authorizedOrgIdRolePairsJson,
-                    new TypeReference<>() {
-                    });
+            this.authorizedOrgIdRolePairs = mapper.readValue(authorizedOrgIdRolePairsJson, new TypeReference<>() {});
+            log.info("Parsed authorizedOrgIdRolePairs: {}", authorizedOrgIdRolePairs);
         } catch (IOException e) {
             log.error("Error parsing authorizedOrgIdRolePairsJson: {}", e.getMessage(), e);
         }
