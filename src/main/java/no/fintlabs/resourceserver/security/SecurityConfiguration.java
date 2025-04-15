@@ -56,6 +56,17 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
+    @Order(0)
+    @Bean
+    SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
+        http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/**"))
+                .authorizeExchange(exchange -> exchange.anyExchange().permitAll())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable);
+
+        return http.build();
+    }
+
     @Order(1)
     @Bean
     SecurityWebFilterChain internalApiFilterChain(
