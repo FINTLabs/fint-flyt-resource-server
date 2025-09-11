@@ -14,7 +14,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v3
 
       - name: Gradle Build Action
         uses: gradle/gradle-build-action@v2
