@@ -11,7 +11,6 @@ import no.fintlabs.resourceserver.security.properties.ApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -27,7 +26,6 @@ import org.springframework.security.web.server.util.matcher.PathPatternParserSer
 import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
-@EnableAutoConfiguration
 @Import(FintCacheConfiguration.class)
 @Slf4j
 public class SecurityConfiguration {
@@ -56,6 +54,11 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
+    @Bean
+    UserJwtConverter userJwtConverter(InternalApiSecurityProperties internalApiSecurityProperties) {
+        return new UserJwtConverter(internalApiSecurityProperties, this.userClaimFormattingService);
+    }
+
     @Order(0)
     @Bean
     SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
@@ -71,13 +74,14 @@ public class SecurityConfiguration {
     @Bean
     SecurityWebFilterChain internalApiFilterChain(
             ServerHttpSecurity http,
-            InternalApiSecurityProperties internalApiSecurityProperties
+            InternalApiSecurityProperties internalApiSecurityProperties,
+            UserJwtConverter userJwtConverter
     ) {
         log.debug("Internal API Security Properties: {}", (Object) internalApiSecurityProperties.getPermittedAuthorities());
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
-                new UserJwtConverter(internalApiSecurityProperties, this.userClaimFormattingService),
+                userJwtConverter,
                 internalApiSecurityProperties
         );
     }
@@ -127,7 +131,8 @@ public class SecurityConfiguration {
     ) {
         http
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path))
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
+                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+                .csrf(ServerHttpSecurity.CsrfSpec::disable);
 
         if (!apiSecurityProperties.isEnabled()) {
             return denyAll(http);
@@ -136,32 +141,24 @@ public class SecurityConfiguration {
         return apiSecurityProperties.isPermitAll()
                 ? permitAll(http)
                 : http
-                .oauth2ResourceServer((resourceServer) -> resourceServer
-                        .jwt()
-                        .jwtAuthenticationConverter(converter)
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(converter))
                 )
-                .authorizeExchange()
-                .anyExchange()
-                .hasAnyAuthority(apiSecurityProperties.getPermittedAuthorities())
-                .and()
+                .authorizeExchange(exchange -> exchange.anyExchange().hasAnyAuthority(apiSecurityProperties.getPermittedAuthorities()))
                 .build();
     }
 
     private SecurityWebFilterChain permitAll(ServerHttpSecurity http) {
         return http
-                .authorizeExchange()
-                .anyExchange()
-                .permitAll()
-                .and()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchange -> exchange.anyExchange().permitAll())
                 .build();
     }
 
     private SecurityWebFilterChain denyAll(ServerHttpSecurity http) {
         return http
-                .authorizeExchange()
-                .anyExchange()
-                .denyAll()
-                .and()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchange -> exchange.anyExchange().denyAll())
                 .build();
     }
 
