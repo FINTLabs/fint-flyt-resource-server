@@ -1,7 +1,7 @@
 package no.fintlabs.resourceserver;
 
 import no.fintlabs.resourceserver.security.SecurityConfiguration;
-import no.fintlabs.resourceserver.security.client.ClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.InternalClientJwtConverter;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.user.userpermission.UserPermissionConsumerConfiguration;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.FilterType;
 
 @SpringBootApplication
 @ComponentScan(basePackageClasses = {
-        ClientJwtConverter.class,
+        InternalClientJwtConverter.class,
         SourceApplicationJwtConverter.class,
         SecurityConfiguration.class,
 }, excludeFilters = @ComponentScan.Filter(

@@ -61,7 +61,7 @@ class ExternalApiDisabledTest {
         )));
     }
 
-    private void clientIsAuthorized(String clientId, String sourceApplicationId) {
+    private void clientIsAuthorized(String clientId, Long sourceApplicationId) {
         when(clientAuthorizationRequestService.getClientAuthorization(clientId)).thenReturn(Optional.of(
                 SourceApplicationAuthorization
                         .builder()
@@ -75,7 +75,7 @@ class ExternalApiDisabledTest {
     @Test
     void given_token_with_clientId_that_is_authorized_the_request_should_return_unauthorized() {
         tokenContainsClientId("clientId1234");
-        clientIsAuthorized("clientId1234", "1");
+        clientIsAuthorized("clientId1234", 1L);
         webTestClient.get()
                 .uri(externalApiUrl)
                 .headers(http -> http.setBearerAuth(jwtString))

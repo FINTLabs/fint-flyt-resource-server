@@ -1,13 +1,13 @@
 package no.fintlabs.resourceserver;
 
 
-public class UrlPaths {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class UrlPaths {
+    // TODO 21/10/2025 eivindmorch: Admin here?
     public static final String EXTERNAL_API = "/api";
     public static final String INTERNAL_API = "/api/intern";
     public static final String INTERNAL_CLIENT_API = "/api/intern-klient";
-
-    private UrlPaths() {
-    }
-
 }

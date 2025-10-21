@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class SourceApplicationAuthorization {
     private boolean authorized;
     private String clientId;
-    private String sourceApplicationId;
+    private Long sourceApplicationId;
 }

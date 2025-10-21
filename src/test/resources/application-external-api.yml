@@ -5,5 +5,4 @@ fint:
         api:
           external:
             enabled: true
-            permit-all: false
             authorized-client-ids: 1

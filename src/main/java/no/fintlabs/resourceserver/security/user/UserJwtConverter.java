@@ -2,80 +2,63 @@ package no.fintlabs.resourceserver.security.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
+import no.fintlabs.cache.FintCache;
+import no.fintlabs.resourceserver.security.AuthorityMappingService;
+import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    private final InternalApiSecurityProperties securityProperties;
-    private final UserClaimFormattingService userClaimFormattingService;
+    private final FintCache<String, UserPermission> userPermissionCache;
+    private final AuthorityMappingService authorityMappingService;
 
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
-        String organizationId = jwt.getClaimAsString("organizationid");
-        String objectIdentifier = jwt.getClaimAsString("objectidentifier");
-        List<String> roles = jwt.getClaimAsStringList("roles");
-        String adminRole = securityProperties.getAdminRole();
-
+        String organizationId = Optional.ofNullable(
+                jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName())
+        ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.ORGANIZATION_ID));
         log.debug("Extracted organization ID from JWT: {}", organizationId);
-        log.debug("Extracted roles from JWT: {}", roles);
+
+        String objectIdentifier = Optional.ofNullable(
+                jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName())
+        ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.OBJECT_IDENTIFIER));
         log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifier);
 
-        Map<String, Object> modifiedClaims = jwt.getClaims()
-                .entrySet()
+        List<String> rolesStringList = jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
+        List<UserRole> userRoles = rolesStringList
                 .stream()
-                .map(entry -> entry.getValue() instanceof String ?
-                        new AbstractMap.SimpleEntry<>(
-                                entry.getKey(),
-                                userClaimFormattingService.removeDoubleQuotesFromClaim((String) entry.getValue())
-                        )
-                        : entry
-                )
-                .filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ));
-        String sourceApplicationIdsString = userClaimFormattingService.convertSourceApplicationIdsIntoString(objectIdentifier);
-        modifiedClaims.put("sourceApplicationIds", sourceApplicationIdsString);
-
-        Jwt modifiedJwt = Jwt.withTokenValue(jwt.getTokenValue())
-                .headers(h -> h.putAll(jwt.getHeaders()))
-                .claims(c -> c.putAll(modifiedClaims))
-                .build();
+                .map(UserRole::getUserRoleFromValue)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+        log.debug("Extracted roles from JWT: {}", rolesStringList);
 
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (organizationId != null && roles != null) {
-            if (adminRole != null && !adminRole.isBlank()) {
-                boolean isAdmin = roles.contains(adminRole);
+//        userPermissionCache.getOptional(objectIdentifier)
+//                .map(UserPermission::getSourceApplicationIds)
+//                .map(authorityMappingService::createSourceApplicationAuthorities)
+//                .ifPresent(authorities::addAll);
 
-                if (isAdmin) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-                }
-            }
-            for (String role : roles) {
-                String orgIdAndRoleGrantedAuthorityString = "ORGID_" + organizationId + "_ROLE_" + role;
-                log.debug("orgIdAndRoleGrantedAuthorityString: {}", orgIdAndRoleGrantedAuthorityString);
-                authorities.add(new SimpleGrantedAuthority(orgIdAndRoleGrantedAuthorityString));
-            }
+        // TODO 17/10/2025 eivindmorch: Replace with and-logic in sec filter?
+        for (UserRole role : userRoles) {
+//            GrantedAuthority orgAndRoleAuthority = authorityMappingService.createOrgAndRoleAuthority(organizationId, role);
+//            log.debug("orgIdAndRoleGrantedAuthorityString: {}", orgAndRoleAuthority);
+//            authorities.add(orgAndRoleAuthority);
         }
-        return Mono.just(new JwtAuthenticationToken(modifiedJwt, authorities));
+        return Mono.just(new JwtAuthenticationToken(jwt, authorities));
     }
 
-
 }
-
