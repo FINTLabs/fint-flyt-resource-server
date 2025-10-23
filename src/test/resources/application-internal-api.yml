@@ -5,4 +5,4 @@ fint:
         api:
           internal:
             enabled: true
-            authorized-org-id-role-pairs-json: "{\"example.no\":[\"ADMIN\"],\"domain.no\":[\"USER\"]}"
+            authorized-org-id-role-pairs-json: "{\"example.no\":[\"ADMIN\", \"USER\"],\"domain.no\":[\"USER\"]}"

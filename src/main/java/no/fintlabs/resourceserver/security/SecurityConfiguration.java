@@ -8,6 +8,8 @@ import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplic
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
+import no.fintlabs.resourceserver.security.user.UserJwtConverter;
+import no.fintlabs.resourceserver.security.user.UserRole;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
@@ -26,6 +30,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @EnableWebFluxSecurity
 @Import(FintCacheConfiguration.class)
@@ -64,41 +70,37 @@ public class SecurityConfiguration {
                 .build();
     }
 
-//    @Order(1)
-//    @Bean
-//    @ConditionalOnBean(InternalApiSecurityProperties.class)
-//    SecurityWebFilterChain internalApiFilterChain(
-//            ServerHttpSecurity http,
-//            InternalApiSecurityProperties internalApiSecurityProperties,
-//            UserJwtConverter userJwtConverter,
-//            AuthorityMappingService authorityMappingService
-//    ) {
-//        //log.debug("Internal API Security Properties: {}", (Object) internalApiSecurityProperties.getPermittedAuthorities());
-//        return createFilterChain(
-//                http,
-//                UrlPaths.INTERNAL_API + "/**",
-//                userJwtConverter,
-//                (authenticationMono, authorizationContext) ->
-//                        authenticationMono.map(authentication -> {
-//                            authentication.getAuthorities().stream()
-//                        })
-    // TODO 21/10/2025 eivindmorch: Should check orgId and user role in converter when creating authentication, not in filter chain?
-//                AuthorityReactiveAuthorizationManager
-//                        .hasAnyAuthority(
-//                                mapToAuthoritiesArray(
-//                                        internalApiSecurityProperties.getUserRolesPerOrgId()
-//                                                .entrySet()
-//                                                .stream()
-//                                                .flatMap(entry ->
-//                                                        authorityMappingService.createOrgAndRoleAuthorities(
-//                                                                entry.getKey(),
-//                                                                entry.getValue()
-//                                                        ).stream()
-//                                                ).to
-//                                )
-//                        )
-//        );
-//    }
+    @Bean
+    RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl
+                .withRolePrefix(AuthorityPrefix.ROLE.getValue())
+                .role(UserRole.DEVELOPER.getRoleValue()).implies(UserRole.ADMIN.getRoleValue())
+                .role(UserRole.ADMIN.getRoleValue()).implies(UserRole.USER.getRoleValue())
+                .build();
+    }
+
+    @Order(1)
+    @Bean
+    @ConditionalOnBean(InternalApiSecurityProperties.class)
+    SecurityWebFilterChain internalApiFilterChain(
+            ServerHttpSecurity http,
+            InternalApiSecurityProperties internalApiSecurityProperties,
+            UserJwtConverter userJwtConverter,
+            AuthorityMappingService authorityMappingService
+    ) {
+        //log.debug("Internal API Security Properties: {}", (Object) internalApiSecurityProperties.getPermittedAuthorities());
+        return createFilterChain(
+                http,
+                UrlPaths.INTERNAL_API + "/**",
+                userJwtConverter,
+                AuthorityReactiveAuthorizationManager.hasAuthority(
+                        authorityMappingService.toAuthorityString(
+                                AuthorityPrefix.ROLE,
+                                UserRole.USER.getRoleValue()
+                        )
+                )
+        );
+    }
 
     @Order(2)
     @Bean

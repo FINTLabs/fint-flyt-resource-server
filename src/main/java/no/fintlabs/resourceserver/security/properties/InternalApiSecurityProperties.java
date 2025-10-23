@@ -12,26 +12,26 @@ import no.fintlabs.resourceserver.security.user.UserRole;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
 public class InternalApiSecurityProperties {
     private boolean enabled;
     private String authorizedOrgIdRolePairsJson = "{}";
-    private Map<String, List<UserRole>> userRolesPerOrgId = Collections.emptyMap();
+    @Getter
+    private Map<String, Set<UserRole>> userRoleFilterPerOrgId = Collections.emptyMap();
 
     @PostConstruct
     public void parseAndSetAuthorizedOrgIdRolePairs() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            this.userRolesPerOrgId = mapper.readValue(authorizedOrgIdRolePairsJson, new TypeReference<>() {
+            this.userRoleFilterPerOrgId = mapper.readValue(authorizedOrgIdRolePairsJson, new TypeReference<>() {
             });
-            log.info("Parsed authorizedOrgIdRolePairs: {}", userRolesPerOrgId);
+            log.info("Parsed authorizedOrgIdRolePairs: {}", userRoleFilterPerOrgId);
         } catch (IOException e) {
             log.error("Error parsing authorizedOrgIdRolePairsJson: {}", e.getMessage(), e);
         }

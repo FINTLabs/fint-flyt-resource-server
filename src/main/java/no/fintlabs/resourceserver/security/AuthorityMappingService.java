@@ -1,5 +1,6 @@
 package no.fintlabs.resourceserver.security;
 
+import no.fintlabs.resourceserver.security.user.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,18 @@ public class AuthorityMappingService {
                 .collect(Collectors.toSet());
     }
 
+    public List<GrantedAuthority> createRoleAuthorities(Collection<UserRole> roles) {
+        return roles.stream().map(this::createRoleAuthority).toList();
+    }
+
+    public GrantedAuthority createRoleAuthority(UserRole role) {
+        return new SimpleGrantedAuthority(
+                toAuthorityString(
+                        AuthorityPrefix.ROLE,
+                        role.getRoleValue()
+                )
+        );
+    }
 
     public List<GrantedAuthority> createSourceApplicationAuthorities(Collection<Long> sourceApplicationIds) {
         return sourceApplicationIds.stream().map(this::createSourceApplicationAuthority).toList();
