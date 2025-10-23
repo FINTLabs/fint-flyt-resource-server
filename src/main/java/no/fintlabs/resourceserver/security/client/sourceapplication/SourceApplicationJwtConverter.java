@@ -25,6 +25,7 @@ public class SourceApplicationJwtConverter implements Converter<Jwt, Mono<Abstra
         this.sourceApplicationAuthorizationRequestService = sourceApplicationAuthorizationRequestService;
     }
 
+    // TODO: Consider moving source app id to Authentication.name
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt source) {
         return Mono.fromCallable(

@@ -31,8 +31,6 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @EnableWebFluxSecurity
 @Import(FintCacheConfiguration.class)
 @Slf4j
@@ -59,7 +57,16 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
-    // TODO 16/10/2025 eivindmorch: Wrong path? Is this necessary at all?
+    // todo Check if underscore is added or not
+    @Bean
+    RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl
+                .withRolePrefix(AuthorityPrefix.ROLE.getValue() + AuthorityMappingService.AUTHORITY_DELIMITER)
+                .role(UserRole.DEVELOPER.getRoleValue()).implies(UserRole.ADMIN.getRoleValue())
+                .role(UserRole.ADMIN.getRoleValue()).implies(UserRole.USER.getRoleValue())
+                .build();
+    }
+
     @Order(0)
     @Bean
     SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
@@ -70,25 +77,35 @@ public class SecurityConfiguration {
                 .build();
     }
 
+    @Order(1)
     @Bean
-    RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl
-                .withRolePrefix(AuthorityPrefix.ROLE.getValue())
-                .role(UserRole.DEVELOPER.getRoleValue()).implies(UserRole.ADMIN.getRoleValue())
-                .role(UserRole.ADMIN.getRoleValue()).implies(UserRole.USER.getRoleValue())
-                .build();
+    @ConditionalOnBean(InternalApiSecurityProperties.class)
+    SecurityWebFilterChain internalAdminApiFilterChain(
+            ServerHttpSecurity http,
+            UserJwtConverter userJwtConverter,
+            AuthorityMappingService authorityMappingService
+    ) {
+        return createFilterChain(
+                http,
+                UrlPaths.INTERNAL_ADMIN_API + "/**",
+                userJwtConverter,
+                AuthorityReactiveAuthorizationManager.hasAuthority(
+                        authorityMappingService.toAuthorityString(
+                                AuthorityPrefix.ROLE,
+                                UserRole.ADMIN.getRoleValue()
+                        )
+                )
+        );
     }
 
-    @Order(1)
+    @Order(2)
     @Bean
     @ConditionalOnBean(InternalApiSecurityProperties.class)
     SecurityWebFilterChain internalApiFilterChain(
             ServerHttpSecurity http,
-            InternalApiSecurityProperties internalApiSecurityProperties,
             UserJwtConverter userJwtConverter,
             AuthorityMappingService authorityMappingService
     ) {
-        //log.debug("Internal API Security Properties: {}", (Object) internalApiSecurityProperties.getPermittedAuthorities());
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
@@ -102,7 +119,7 @@ public class SecurityConfiguration {
         );
     }
 
-    @Order(2)
+    @Order(3)
     @Bean
     @ConditionalOnBean(InternalClientApiSecurityProperties.class)
     SecurityWebFilterChain internalClientApiFilterChain(
@@ -124,7 +141,7 @@ public class SecurityConfiguration {
         );
     }
 
-    @Order(3)
+    @Order(4)
     @Bean
     @ConditionalOnBean(ExternalApiSecurityProperties.class)
     SecurityWebFilterChain externalApiFilterChain(
@@ -146,8 +163,7 @@ public class SecurityConfiguration {
         );
     }
 
-    // TODO 16/10/2025 eivindmorch: Necessary?
-    @Order(4)
+    @Order(5)
     @Bean
     SecurityWebFilterChain globalFilterChain(ServerHttpSecurity http) {
         http.addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);

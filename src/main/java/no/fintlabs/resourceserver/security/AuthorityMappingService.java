@@ -37,7 +37,7 @@ public class AuthorityMappingService {
         return authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority.startsWith(prefix.getValue()))
-                .map(authority -> authority.substring(prefix.getValue().length() + 1))
+                .map(authority -> authority.substring(prefix.getValue().length() + AUTHORITY_DELIMITER.length()))
                 .collect(Collectors.toSet());
     }
 
