@@ -18,13 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    private final FintCache<String, UserPermission> userPermissionCache;
+    private final FintCache<UUID, UserPermission> userPermissionCache;
     private final AuthorityMappingService authorityMappingService;
     private final UserRoleFilteringService userRoleFilteringService;
 
@@ -37,10 +38,12 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
             ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.ORGANIZATION_ID));
             log.debug("Extracted organization ID from JWT: {}", organizationId);
 
-            String objectIdentifier = Optional.ofNullable(
+            String objectIdentifierString = Optional.ofNullable(
                     jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName())
             ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.OBJECT_IDENTIFIER));
-            log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifier);
+            log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifierString);
+
+            UUID objectIdentifier = UUID.fromString(objectIdentifierString);
 
             List<GrantedAuthority> authorities = new ArrayList<>();
 

@@ -92,7 +92,7 @@ public class SecurityConfiguration {
                 AuthorityReactiveAuthorizationManager.hasAuthority(
                         authorityMappingService.toAuthorityString(
                                 AuthorityPrefix.ROLE,
-                                UserRole.ADMIN.getRoleValue()
+                                UserRole.ADMIN.name()
                         )
                 )
         );
@@ -113,7 +113,7 @@ public class SecurityConfiguration {
                 AuthorityReactiveAuthorizationManager.hasAuthority(
                         authorityMappingService.toAuthorityString(
                                 AuthorityPrefix.ROLE,
-                                UserRole.USER.getRoleValue()
+                                UserRole.USER.name()
                         )
                 )
         );

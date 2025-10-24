@@ -1,0 +1,17 @@
+fint:
+  flyt:
+    resource-server:
+      security:
+        api:
+          external:
+            enabled: true
+            authorized-client-ids: 1
+
+          internal:
+            enabled: true
+            authorized-org-id-role-pairs-json: "{\"example.no\":[\"ADMIN\", \"USER\"],\"domain.no\":[\"USER\",\"ADMIN\"]}"
+
+          internal-client:
+            enabled: true
+            authorized-client-ids:
+              - 1234

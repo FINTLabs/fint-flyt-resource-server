@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import java.time.Duration;
+import java.util.UUID;
 
 @Configuration
 @Import(FintCacheConfiguration.class)
@@ -23,10 +24,10 @@ public class UserPermissionCacheConfiguration {
     }
 
     @Bean
-    FintCache<String, UserPermission> userPermissionCache() {
+    FintCache<UUID, UserPermission> userPermissionCache() {
         return fintCacheManager.createCache(
                 "userpermission",
-                String.class,
+                UUID.class,
                 UserPermission.class,
                 FintCacheOptions
                         .builder()

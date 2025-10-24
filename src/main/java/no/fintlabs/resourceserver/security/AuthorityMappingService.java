@@ -42,14 +42,16 @@ public class AuthorityMappingService {
     }
 
     public List<GrantedAuthority> createRoleAuthorities(Collection<UserRole> roles) {
-        return roles.stream().map(this::createRoleAuthority).toList();
+        return roles.stream()
+                .map(this::createRoleAuthority)
+                .toList();
     }
 
     public GrantedAuthority createRoleAuthority(UserRole role) {
         return new SimpleGrantedAuthority(
                 toAuthorityString(
                         AuthorityPrefix.ROLE,
-                        role.getRoleValue()
+                        role.name()
                 )
         );
     }
@@ -71,23 +73,5 @@ public class AuthorityMappingService {
                 clientId
         ));
     }
-
-//    public List<GrantedAuthority> createOrgAndRoleAuthorities(String orgId, List<UserRole> userRoles) {
-//        return userRoles
-//                .stream()
-//                .map(userRole -> createOrgAndRoleAuthority(orgId, userRole))
-//                .toList();
-//    }
-//
-//    public GrantedAuthority createOrgAndRoleAuthority(String orgId, UserRole userRole) {
-//        return new SimpleGrantedAuthority(
-//                new StringJoiner(AUTHORITY_DELIMITER)
-//                        .add(AuthorityPrefix.ORG_ID.getValue())
-//                        .add(orgId)
-//                        .add(AuthorityPrefix.ROLE.getValue())
-//                        .add(userRole.getRoleValue())
-//                        .toString()
-//        );
-//    }
 
 }

@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
+import java.util.UUID;
+
 
 @Configuration
 @Import(
@@ -21,11 +23,11 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 @Slf4j
 public class UserPermissionConsumerConfiguration {
     private final EntityConsumerFactoryService entityConsumerFactoryService;
-    private final FintCache<String, UserPermission> userPermissionCache;
+    private final FintCache<UUID, UserPermission> userPermissionCache;
 
     public UserPermissionConsumerConfiguration(
             EntityConsumerFactoryService entityConsumerFactoryService,
-            FintCache<String, UserPermission> userPermissionCache
+            FintCache<UUID, UserPermission> userPermissionCache
     ) {
         this.entityConsumerFactoryService = entityConsumerFactoryService;
         this.userPermissionCache = userPermissionCache;
@@ -44,7 +46,7 @@ public class UserPermissionConsumerConfiguration {
                                     consumerRecord.value().getSourceApplicationIds()
                             );
                             userPermissionCache.put(
-                                    consumerRecord.key(),
+                                    UUID.fromString(consumerRecord.key()),
                                     consumerRecord.value()
                             );
                         })
