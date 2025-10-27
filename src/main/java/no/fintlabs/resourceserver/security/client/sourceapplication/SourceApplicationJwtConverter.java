@@ -1,6 +1,6 @@
 package no.fintlabs.resourceserver.security.client.sourceapplication;
 
-import no.fintlabs.resourceserver.security.AuthorityMappingService;
+import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,14 +14,14 @@ import java.util.Optional;
 @Service
 public class SourceApplicationJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    private final AuthorityMappingService authorityMappingService;
+    private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
     private final SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService;
 
     public SourceApplicationJwtConverter(
-            AuthorityMappingService authorityMappingService,
+            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService,
             SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService
     ) {
-        this.authorityMappingService = authorityMappingService;
+        this.sourceApplicationAuthorityMappingService = sourceApplicationAuthorityMappingService;
         this.sourceApplicationAuthorizationRequestService = sourceApplicationAuthorizationRequestService;
     }
 
@@ -32,7 +32,7 @@ public class SourceApplicationJwtConverter implements Converter<Jwt, Mono<Abstra
                 () -> Optional.ofNullable(source.<String>getClaim("sub"))
                         .flatMap(sourceApplicationAuthorizationRequestService::getClientAuthorization)
                         .map(SourceApplicationAuthorization::getSourceApplicationId)
-                        .map(authorityMappingService::createSourceApplicationAuthority)
+                        .map(sourceApplicationAuthorityMappingService::createSourceApplicationAuthority)
                         .map(grantedAuthority -> new JwtAuthenticationToken(source, List.of(grantedAuthority)))
                         .orElseGet(() -> new JwtAuthenticationToken(source))
         );

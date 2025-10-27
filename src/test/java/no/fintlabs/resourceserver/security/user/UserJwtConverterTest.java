@@ -1,7 +1,8 @@
 package no.fintlabs.resourceserver.security.user;
 
 import no.fintlabs.cache.FintCache;
-import no.fintlabs.resourceserver.security.AuthorityMappingService;
+import no.fintlabs.resourceserver.security.RoleAuthorityMappingService;
+import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
 import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,9 +31,11 @@ import static org.mockito.Mockito.when;
 class UserJwtConverterTest {
 
     @Mock
-    private FintCache<String, UserPermission> userPermissionCache;
+    private FintCache<UUID, UserPermission> userPermissionCache;
     @Mock
-    private AuthorityMappingService authorityMappingService;
+    private SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
+    @Mock
+    private RoleAuthorityMappingService roleAuthorityMappingService;
     @Mock
     private UserRoleFilteringService userRoleFilteringService;
     @InjectMocks
@@ -74,7 +77,7 @@ class UserJwtConverterTest {
         when(jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName()))
                 .thenReturn(objectIdentifier.toString());
 
-        when(userPermissionCache.getOptional(objectIdentifier.toString()))
+        when(userPermissionCache.getOptional(objectIdentifier))
                 .thenReturn(Optional.empty());
 
         when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(List.of());
@@ -90,10 +93,11 @@ class UserJwtConverterTest {
 
         verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName());
         verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName());
-        verify(userPermissionCache).getOptional(objectIdentifier.toString());
+        verify(userPermissionCache).getOptional(objectIdentifier);
         verify(jwt).getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
         verifyNoMoreInteractions(
-                authorityMappingService,
+                roleAuthorityMappingService,
+                sourceApplicationAuthorityMappingService,
                 userPermissionCache,
                 userRoleFilteringService
         );
@@ -114,11 +118,11 @@ class UserJwtConverterTest {
 
         GrantedAuthority sourceApplicationAuthority1 = mock(GrantedAuthority.class);
         GrantedAuthority sourceApplicationAuthority2 = mock(GrantedAuthority.class);
-        when(authorityMappingService.createSourceApplicationAuthorities(sourceApplicationIds)).thenReturn(List.of(
+        when(sourceApplicationAuthorityMappingService.createSourceApplicationAuthorities(sourceApplicationIds)).thenReturn(List.of(
                 sourceApplicationAuthority1, sourceApplicationAuthority2
         ));
 
-        when(userPermissionCache.getOptional(objectIdentifier.toString()))
+        when(userPermissionCache.getOptional(objectIdentifier))
                 .thenReturn(Optional.of(userPermission));
 
         List<String> roleClaims = List.of("TEST_ROLE_1", "TEST_ROLE_2");
@@ -129,7 +133,7 @@ class UserJwtConverterTest {
                 .thenReturn(filteredUserRoles);
 
         GrantedAuthority roleAuthority = mock(GrantedAuthority.class);
-        when(authorityMappingService.createRoleAuthorities(filteredUserRoles))
+        when(roleAuthorityMappingService.createRoleAuthorities(filteredUserRoles))
                 .thenReturn(List.of(roleAuthority));
 
         StepVerifier.create(converter.convert(jwt))
@@ -148,14 +152,15 @@ class UserJwtConverterTest {
         verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName());
         verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName());
         verify(userPermission).getSourceApplicationIds();
-        verify(authorityMappingService).createSourceApplicationAuthorities(sourceApplicationIds);
-        verify(userPermissionCache).getOptional(objectIdentifier.toString());
+        verify(sourceApplicationAuthorityMappingService).createSourceApplicationAuthorities(sourceApplicationIds);
+        verify(userPermissionCache).getOptional(objectIdentifier);
         verify(jwt).getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
         verify(userRoleFilteringService).filter(roleClaims, "testOrganizationId");
-        verify(authorityMappingService).createRoleAuthorities(filteredUserRoles);
+        verify(roleAuthorityMappingService).createRoleAuthorities(filteredUserRoles);
         verifyNoMoreInteractions(
                 userPermission,
-                authorityMappingService,
+                roleAuthorityMappingService,
+                sourceApplicationAuthorityMappingService,
                 userPermissionCache,
                 userRoleFilteringService
         );

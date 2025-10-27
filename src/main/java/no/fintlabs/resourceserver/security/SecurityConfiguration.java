@@ -80,14 +80,14 @@ public class SecurityConfiguration {
     SecurityWebFilterChain internalAdminApiFilterChain(
             ServerHttpSecurity http,
             UserJwtConverter userJwtConverter,
-            AuthorityMappingService authorityMappingService
+            RoleAuthorityMappingService roleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_ADMIN_API + "/**",
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.ADMIN))
+                        roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.ADMIN))
                                 .toArray(new String[0])
                 )
         );
@@ -99,14 +99,14 @@ public class SecurityConfiguration {
     SecurityWebFilterChain internalApiFilterChain(
             ServerHttpSecurity http,
             UserJwtConverter userJwtConverter,
-            AuthorityMappingService authorityMappingService
+            RoleAuthorityMappingService roleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_API + "/**",
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.USER)).toArray(new String[0])
+                        roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.USER)).toArray(new String[0])
                 )
         );
     }
@@ -118,17 +118,17 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
             InternalClientJwtConverter internalClientJwtConverter,
-            AuthorityMappingService authorityMappingService
+            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService
+
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.INTERNAL_CLIENT_API + "/**",
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.toAuthorities(
-                                AuthorityPrefix.SOURCE_APPLICATION_ID,
+                        sourceApplicationAuthorityMappingService.createSourceApplicationAuthorityStrings(
                                 internalClientApiSecurityProperties.getAuthorizedClientIds()
-                        )
+                        ).toArray(new String[0])
                 )
         );
     }
@@ -140,17 +140,16 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             ExternalApiSecurityProperties externalApiSecurityProperties,
             SourceApplicationJwtConverter sourceApplicationJwtConverter,
-            AuthorityMappingService authorityMappingService
+            ClientAuthorityMappingService clientAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.EXTERNAL_API + "/**",
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.toAuthorities(
-                                AuthorityPrefix.CLIENT_ID,
+                        clientAuthorityMappingService.createInternalClientIdAuthorityStrings(
                                 externalApiSecurityProperties.getAuthorizedClientIds()
-                        )
+                        ).toArray(new String[0])
                 )
         );
     }

@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class InternalClientApiSecurityProperties {
     private boolean enabled;
-    private List<String> authorizedClientIds;
+    private List<Long> authorizedClientIds;
 }

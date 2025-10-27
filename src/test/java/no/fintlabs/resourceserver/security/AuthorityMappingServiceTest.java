@@ -1,6 +1,5 @@
 package no.fintlabs.resourceserver.security;
 
-import no.fintlabs.resourceserver.security.user.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,45 +63,6 @@ public class AuthorityMappingServiceTest {
         assertThat(strings).isEqualTo(
                 Set.of("a", "b")
         );
-    }
-
-    @Test
-    void createRoleAuthorities() {
-        Collection<UserRole> roles = List.of(UserRole.USER, UserRole.DEVELOPER);
-        List<GrantedAuthority> roleAuthorities = authorityMappingService.createRoleAuthorities(roles);
-
-        assertThat(roleAuthorities)
-                .extracting(GrantedAuthority::getAuthority)
-                .containsExactlyInAnyOrder("ROLE_USER", "ROLE_DEVELOPER");
-    }
-
-    @Test
-    void createRoleAuthority() {
-        UserRole role = UserRole.USER;
-
-        GrantedAuthority roleAuthority = authorityMappingService.createRoleAuthority(role);
-
-        assertThat(roleAuthority.getAuthority()).isEqualTo("ROLE_USER");
-    }
-
-
-    @Test
-    void givenSourceApplicationIdShouldReturnGrantedAuthority() {
-        Long sourceApplicationId = 2L;
-        GrantedAuthority sourceApplicationAuthority = authorityMappingService.createSourceApplicationAuthority(sourceApplicationId);
-
-        assertThat(sourceApplicationAuthority).isEqualTo(
-                new SimpleGrantedAuthority("SOURCE_APPLICATION_ID_2")
-        );
-    }
-
-    @Test
-    void createInternalClientIdAuthority() {
-        String clientId = "something";
-        GrantedAuthority internalClientIdAuthority = authorityMappingService.createInternalClientIdAuthority(clientId);
-
-        assertThat(internalClientIdAuthority.getAuthority()).isEqualTo("CLIENT_ID_something");
-
     }
 
 }

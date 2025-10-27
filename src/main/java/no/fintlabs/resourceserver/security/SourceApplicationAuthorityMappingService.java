@@ -22,6 +22,12 @@ public class SourceApplicationAuthorityMappingService {
         return new SimpleGrantedAuthority(createSourceApplicationAuthorityString(sourceApplicationId));
     }
 
+    public List<String> createSourceApplicationAuthorityStrings(Collection<Long> sourceApplicationIds) {
+        return sourceApplicationIds.stream()
+                .map(this::createSourceApplicationAuthorityString)
+                .toList();
+    }
+
     public String createSourceApplicationAuthorityString(Long sourceApplicationId) {
         return authorityMappingService.toAuthority(
                 AuthorityPrefix.SOURCE_APPLICATION_ID,
