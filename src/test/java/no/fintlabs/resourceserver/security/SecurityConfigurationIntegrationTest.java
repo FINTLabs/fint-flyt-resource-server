@@ -65,15 +65,43 @@ class SecurityConfigurationIntegrationTest {
     void shouldAllowAccessToInternalApiForUserRole() {
         tokenContainsOrgIdAndRoles(
                 UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
-                "domain.no",
-                List.of(UserRole.ADMIN.getRoleValue())
+                "domain-with-user-access.no",
+                List.of(UserRole.USER.getRoleValue())
         );
-        WebTestClient.ResponseSpec ok = webTestClient.get()
+        webTestClient.get()
                 .uri("/api/intern/dummy")
                 .headers(http -> http.setBearerAuth(jwtString))
                 .exchange()
                 .expectStatus().isOk();
     }
+
+    @Test
+    void shouldAllowAccessToInternalApiForAdminRole() {
+        tokenContainsOrgIdAndRoles(
+                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
+                "domain-with-user-access.no",
+                List.of(UserRole.ADMIN.getRoleValue())
+        );
+        webTestClient.get()
+                .uri("/api/intern/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+//    @Test
+//    void shouldAllowAccessToInternalApiForDevRole() {
+//        tokenContainsOrgIdAndRoles(
+//                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
+//                "domain-with-user-access.no",
+//                List.of(UserRole.ADMIN.getRoleValue())
+//        );
+//        WebTestClient.ResponseSpec ok = webTestClient.get()
+//                .uri("/api/intern/dummy")
+//                .headers(http -> http.setBearerAuth(jwtString))
+//                .exchange()
+//                .expectStatus().isOk();
+//    }
 
     private void tokenContainsOrgIdAndRoles(
             UUID objectIdentifier,

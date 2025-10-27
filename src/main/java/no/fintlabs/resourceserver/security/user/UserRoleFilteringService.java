@@ -18,12 +18,12 @@ public class UserRoleFilteringService {
 
     private final InternalApiSecurityProperties internalApiSecurityProperties;
 
-    public Set<UserRole> filter(List<String> rolesStringList, String organizationId) {
-        if (rolesStringList.isEmpty()) {
+    public Set<UserRole> filter(List<String> roleValues, String organizationId) {
+        if (roleValues.isEmpty()) {
             return Collections.emptySet();
         }
 
-        Set<UserRole> filteredUserRoles = rolesStringList
+        Set<UserRole> filteredUserRoles = roleValues
                 .stream()
                 .map(UserRole::getUserRoleFromValue)
                 .filter(Optional::isPresent)

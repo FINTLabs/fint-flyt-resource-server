@@ -1,8 +1,0 @@
-fint:
-  flyt:
-    resource-server:
-      security:
-        api:
-          internal:
-            enabled: true
-            authorized-org-id-role-pairs-json: "{\"example.no\":[\"ADMIN\", \"USER\"],\"domain.no\":[\"USER\"]}"

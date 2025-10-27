@@ -1,8 +1,0 @@
-fint:
-  flyt:
-    resource-server:
-      security:
-        api:
-          external:
-            enabled: true
-            authorized-client-ids: 1

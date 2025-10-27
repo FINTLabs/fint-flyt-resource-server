@@ -17,8 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
@@ -30,6 +28,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.Set;
 
 @EnableWebFluxSecurity
 @Import(FintCacheConfiguration.class)
@@ -57,15 +58,11 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
-    // todo Check if underscore is added or not
-    @Bean
-    RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl
-                .withRolePrefix(AuthorityPrefix.ROLE.getValue() + AuthorityMappingService.AUTHORITY_DELIMITER)
-                .role(UserRole.DEVELOPER.getRoleValue()).implies(UserRole.ADMIN.getRoleValue())
-                .role(UserRole.ADMIN.getRoleValue()).implies(UserRole.USER.getRoleValue())
-                .build();
-    }
+    private static final Map<UserRole, Set<UserRole>> ROLE_HIERARCHY = Map.of(
+            UserRole.USER, Set.of(UserRole.USER, UserRole.DEVELOPER, UserRole.ADMIN),
+            UserRole.DEVELOPER, Set.of(UserRole.DEVELOPER),
+            UserRole.ADMIN, Set.of(UserRole.ADMIN, UserRole.DEVELOPER)
+    );
 
     @Order(0)
     @Bean
@@ -89,11 +86,9 @@ public class SecurityConfiguration {
                 http,
                 UrlPaths.INTERNAL_ADMIN_API + "/**",
                 userJwtConverter,
-                AuthorityReactiveAuthorizationManager.hasAuthority(
-                        authorityMappingService.toAuthorityString(
-                                AuthorityPrefix.ROLE,
-                                UserRole.ADMIN.name()
-                        )
+                AuthorityReactiveAuthorizationManager.hasAnyAuthority(
+                        authorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.ADMIN))
+                                .toArray(new String[0])
                 )
         );
     }
@@ -110,11 +105,8 @@ public class SecurityConfiguration {
                 http,
                 UrlPaths.INTERNAL_API + "/**",
                 userJwtConverter,
-                AuthorityReactiveAuthorizationManager.hasAuthority(
-                        authorityMappingService.toAuthorityString(
-                                AuthorityPrefix.ROLE,
-                                UserRole.USER.name()
-                        )
+                AuthorityReactiveAuthorizationManager.hasAnyAuthority(
+                        authorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.USER)).toArray(new String[0])
                 )
         );
     }
@@ -133,7 +125,7 @@ public class SecurityConfiguration {
                 UrlPaths.INTERNAL_CLIENT_API + "/**",
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.toAuthoritiesStringArray(
+                        authorityMappingService.toAuthorities(
                                 AuthorityPrefix.SOURCE_APPLICATION_ID,
                                 internalClientApiSecurityProperties.getAuthorizedClientIds()
                         )
@@ -155,7 +147,7 @@ public class SecurityConfiguration {
                 UrlPaths.EXTERNAL_API + "/**",
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        authorityMappingService.toAuthoritiesStringArray(
+                        authorityMappingService.toAuthorities(
                                 AuthorityPrefix.CLIENT_ID,
                                 externalApiSecurityProperties.getAuthorizedClientIds()
                         )
