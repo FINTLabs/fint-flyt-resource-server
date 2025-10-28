@@ -118,7 +118,7 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
             InternalClientJwtConverter internalClientJwtConverter,
-            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService
+            ClientAuthorityMappingService clientAuthorityMappingService
 
     ) {
         return createFilterChain(
@@ -126,31 +126,44 @@ public class SecurityConfiguration {
                 UrlPaths.INTERNAL_CLIENT_API + "/**",
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        sourceApplicationAuthorityMappingService.createSourceApplicationAuthorityStrings(
+                        clientAuthorityMappingService.createInternalClientIdAuthorityStrings(
                                 internalClientApiSecurityProperties.getAuthorizedClientIds()
                         ).toArray(new String[0])
                 )
         );
     }
 
+    // TODO:
+    //  INTERNAL CLIENT
+    //  – Token med clientId (183812y7398172389)
+    //  – Setter authority CLIENT_ID_183812y7398172389
+    //  – Validerer at authorizedClientId i properties i applikasjonen er satt til 183812y7398172389
+    //  EXTERNAL CLIENT
+    //  – Token med clientId (183812y7398172389)
+    //  – Sender clientId til authorization-service og får tilbake evt source application id (2)
+    //  – Setter source application id (2) som authority (SOURCE_APPLICATION_ID_2)
+    //  – Validerer at authorizedClientId (bytt navn) i properties i applikasjonen er satt til 2
+
+
     @Order(4)
     @Bean
     @ConditionalOnBean(ExternalApiSecurityProperties.class)
-    SecurityWebFilterChain externalApiFilterChain(
+    SecurityWebFilterChain externalApiFilterChainTest(
             ServerHttpSecurity http,
             ExternalApiSecurityProperties externalApiSecurityProperties,
             SourceApplicationJwtConverter sourceApplicationJwtConverter,
-            ClientAuthorityMappingService clientAuthorityMappingService
+            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
                 UrlPaths.EXTERNAL_API + "/**",
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        clientAuthorityMappingService.createInternalClientIdAuthorityStrings(
+                        sourceApplicationAuthorityMappingService.createSourceApplicationAuthorityStrings(
                                 externalApiSecurityProperties.getAuthorizedClientIds()
                         ).toArray(new String[0])
                 )
+
         );
     }
 

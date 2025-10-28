@@ -1,6 +1,7 @@
 package no.fintlabs.resourceserver.security;
 
 import no.fintlabs.resourceserver.security.client.InternalClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorization;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationRequestService;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.user.UserClaim;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -64,8 +66,8 @@ class SecurityConfigurationIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("rolesAllowedForInternalApi")
-    void shouldAllowAccessToInternalApiForRoles(UserRole role) {
+    @MethodSource("userAccessScenarios")
+    void shouldAllowAccessToInternalApiForRoles(UserRole role, boolean isAllowed) {
         tokenContainsOrgIdAndRoles(
                 UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
                 "domain-with-user-access.no",
@@ -75,15 +77,134 @@ class SecurityConfigurationIntegrationTest {
                 .uri("/api/intern/dummy")
                 .headers(http -> http.setBearerAuth(jwtString))
                 .exchange()
+                .expectStatus().value(status -> {
+                    if (isAllowed) {
+                        assertThat(status).isEqualTo(HttpStatus.OK.value());
+                    } else {
+                        assertThat(status).isEqualTo(HttpStatus.FORBIDDEN.value());
+                    }
+                });
+    }
+
+    @Test
+    void shouldForbidAccessToInternalApiWhenUnauthenticated() {
+        webTestClient.get()
+                .uri("/api/intern/dummy")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @ParameterizedTest
+    @MethodSource("adminAccessScenarios")
+    void shouldAllowOrDenyAccessToInternalAdminApiForRoles(UserRole role, boolean isAllowed) {
+        tokenContainsOrgIdAndRoles(
+                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
+                "domain-with-user-access.no",
+                List.of(role.getRoleValue())
+        );
+        webTestClient.get()
+                .uri("/api/internal/admin/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().value(status -> {
+                    if (isAllowed) {
+                        assertThat(status).isEqualTo(HttpStatus.OK.value());
+                    } else {
+                        assertThat(status).isEqualTo(HttpStatus.FORBIDDEN.value());
+                    }
+                });
+    }
+
+    @Test
+    void shouldAllowAccessToInternalClientApiWithValidAuthentication() {
+        tokenContainsClientId("9e8118f3-9bc0-4f00-8675-c04bf8fe2494");
+
+        webTestClient.get()
+                .uri("/api/intern-klient/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
                 .expectStatus().isOk();
     }
 
-    private static Stream<UserRole> rolesAllowedForInternalApi() {
-        return Stream.of(
-                UserRole.USER,
-                UserRole.ADMIN,
-                UserRole.DEVELOPER
+    @Test
+    void shouldForbidAccessToInternalClientApiWithUnknownClientId() {
+        tokenContainsClientId("this-client-id-is-unauthorized");
+
+        webTestClient.get()
+                .uri("/api/intern-klient/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    void shouldNotAllowAccessToInternalClientApiWithoutAuthentication() {
+        webTestClient.get()
+                .uri("/api/intern-klient/dummy")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void shouldAllowAccessToExternalApiWithAuthentication() {
+        tokenContainsClientId("7ce63898-7485-4d37-bbd5-7bbefdf74c54");
+
+        when(sourceApplicationAuthorizationRequestService.getClientAuthorization("7ce63898-7485-4d37-bbd5-7bbefdf74c54"))
+                .thenReturn(Optional.of(SourceApplicationAuthorization
+                        .builder()
+                        .authorized(true)
+                        .sourceApplicationId(1L)
+                        .clientId("7ce63898-7485-4d37-bbd5-7bbefdf74c54")
+                        .build())
+                );
+
+        webTestClient.get()
+                .uri("/api/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void shouldForbidAccessToExternalApiWithAUnknownClientId() {
+        tokenContainsClientId("unknown-client-id");
+
+        webTestClient.get()
+                .uri("/api/dummy")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    void shouldNotAllowAccessToExternalApiWithoutAuthentication() {
+        webTestClient.get()
+                .uri("/api/dummy")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void givenNoTokenAndAccessingCatchAllEndpointShouldReturnUnauthorized() {
+        webTestClient.get()
+                .uri("/some/unknown/path")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void givenTokenAndAccessingCatchAllEndpointShouldReturnForbidden() {
+        tokenContainsOrgIdAndRoles(
+                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
+                "domain-with-user-access.no",
+                List.of(UserRole.ADMIN.getRoleValue())
         );
+        webTestClient.get()
+                .uri("some/unknown/path")
+                .headers(http -> http.setBearerAuth(jwtString))
+                .exchange()
+                .expectStatus().isUnauthorized();
+
     }
 
     private void tokenContainsOrgIdAndRoles(
@@ -118,25 +239,12 @@ class SecurityConfigurationIntegrationTest {
         )));
     }
 
-    @ParameterizedTest
-    @MethodSource("adminAccessScenarios")
-    void shouldAllowOrDenyAccessToInternalAdminApiForRoles(UserRole role, boolean isAllowed) {
-        tokenContainsOrgIdAndRoles(
-                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
-                "domain-with-user-access.no",
-                List.of(role.getRoleValue())
+    private static Stream<Object[]> userAccessScenarios() {
+        return Stream.of(
+                new Object[]{UserRole.USER, true},
+                new Object[]{UserRole.ADMIN, true},
+                new Object[]{UserRole.DEVELOPER, true}
         );
-        webTestClient.get()
-                .uri("/api/internal/admin/dummy")
-                .headers(http -> http.setBearerAuth(jwtString))
-                .exchange()
-                .expectStatus().value(status -> {
-                    if (isAllowed) {
-                        assertThat(status).isEqualTo(HttpStatus.OK.value());
-                    } else {
-                        assertThat(status).isEqualTo(HttpStatus.FORBIDDEN.value());
-                    }
-                });
     }
 
     private static Stream<Object[]> adminAccessScenarios() {
@@ -145,59 +253,5 @@ class SecurityConfigurationIntegrationTest {
                 new Object[]{UserRole.ADMIN, true},
                 new Object[]{UserRole.DEVELOPER, true}
         );
-    }
-
-    // TODO
-    @Test
-    void shouldAllowAccessToInternalClientApiWithValidAuthentication() {
-        tokenContainsClientId("1234");
-
-        webTestClient.get()
-                .uri("/api/intern-klient/dummy")
-                .headers(http -> http.setBearerAuth(jwtString))
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    // TODO
-    @Test
-    void shouldNotAllowAccessToInternalClientApiWithoutAuthentication() {
-
-    }
-
-    // TODO
-    @Test
-    void shouldAllowAccessToExternalApiWithAuthentication() {
-
-    }
-
-    // TODO
-    @Test
-    void shouldNotAllowAccessToExternalApiWithoutAuthentication() {
-
-    }
-
-
-    @Test
-    void givenNoTokenAndAccessingCatchAllEndpointShouldReturnUnauthorized() {
-        webTestClient.get()
-                .uri("/some/unknown/path")
-                .exchange()
-                .expectStatus().isUnauthorized();
-    }
-
-    @Test
-    void givenTokenAndAccessingCatchAllEndpointShouldReturnForbidden() {
-        tokenContainsOrgIdAndRoles(
-                UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
-                "domain-with-user-access.no",
-                List.of(UserRole.ADMIN.getRoleValue())
-        );
-        webTestClient.get()
-                .uri("some/unknown/path")
-                .headers(http -> http.setBearerAuth(jwtString))
-                .exchange()
-                .expectStatus().isUnauthorized();
-
     }
 }

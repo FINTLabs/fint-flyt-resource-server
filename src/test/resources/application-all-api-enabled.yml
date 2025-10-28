@@ -5,7 +5,8 @@ fint:
         api:
           external:
             enabled: true
-            authorized-client-ids: 1
+            authorized-client-ids:
+               - 1
 
           internal:
             enabled: true
@@ -14,4 +15,4 @@ fint:
           internal-client:
             enabled: true
             authorized-client-ids:
-              - 1234
+                - "9e8118f3-9bc0-4f00-8675-c04bf8fe2494"
