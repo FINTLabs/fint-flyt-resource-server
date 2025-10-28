@@ -84,7 +84,7 @@ public class SecurityConfiguration {
     ) {
         return createFilterChain(
                 http,
-                UrlPaths.INTERNAL_ADMIN_API + "/**",
+                UrlPaths.INTERNAL_ADMIN_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
                         roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.ADMIN))
@@ -103,7 +103,7 @@ public class SecurityConfiguration {
     ) {
         return createFilterChain(
                 http,
-                UrlPaths.INTERNAL_API + "/**",
+                UrlPaths.INTERNAL_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
                         roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.USER)).toArray(new String[0])
@@ -123,7 +123,7 @@ public class SecurityConfiguration {
     ) {
         return createFilterChain(
                 http,
-                UrlPaths.INTERNAL_CLIENT_API + "/**",
+                UrlPaths.INTERNAL_CLIENT_API,
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
                         clientAuthorityMappingService.createInternalClientIdAuthorityStrings(
@@ -156,7 +156,7 @@ public class SecurityConfiguration {
     ) {
         return createFilterChain(
                 http,
-                UrlPaths.EXTERNAL_API + "/**",
+                UrlPaths.EXTERNAL_API,
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
                         sourceApplicationAuthorityMappingService.createSourceApplicationAuthorityStrings(
@@ -183,7 +183,7 @@ public class SecurityConfiguration {
             ReactiveAuthorizationManager<AuthorizationContext> manager
     ) {
         http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path))
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**"))
                 .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
 
         return http

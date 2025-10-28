@@ -6,7 +6,7 @@ fint:
           external:
             enabled: true
             authorized-client-ids:
-               - 1
+              - 1
 
           internal:
             enabled: true
