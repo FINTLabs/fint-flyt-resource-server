@@ -17,17 +17,17 @@ public enum UserRole {
     DEVELOPER("https://role-catalog.vigoiks.no/vigo/flyt/developer"),
     ADMIN("https://role-catalog.vigoiks.no/vigo/flyt/admin");
 
-    private final String roleValue;
+    private final String claimValue;
 
-    private static final Map<String, UserRole> userRoleByValue =
+    private static final Map<String, UserRole> userRoleByClaimValue =
             Arrays.stream(UserRole.values())
                     .collect(toMap(
-                            UserRole::getRoleValue,
+                            UserRole::getClaimValue,
                             Function.identity()
                     ));
 
     public static Optional<UserRole> getUserRoleFromValue(String roleValue) {
-        return Optional.ofNullable(userRoleByValue.getOrDefault(roleValue, null));
+        return Optional.ofNullable(userRoleByClaimValue.getOrDefault(roleValue, null));
     }
 
 }

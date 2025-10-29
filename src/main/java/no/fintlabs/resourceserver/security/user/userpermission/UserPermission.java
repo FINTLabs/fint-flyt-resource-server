@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 public class UserPermission {
     private UUID objectIdentifier;
-    private List<Long> sourceApplicationIds;
+    private List<Long> sourceApplicationIds; // TODO: Change to set
 
     @JsonCreator
     public UserPermission(@JsonProperty("objectIdentifier") UUID objectIdentifier,

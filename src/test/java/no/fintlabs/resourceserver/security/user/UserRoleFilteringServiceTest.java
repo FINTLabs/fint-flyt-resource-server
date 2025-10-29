@@ -50,7 +50,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndApprovedForOrganizationShouldReturnUserRole() {
-        List<String> roleStringList = List.of(UserRole.USER.getRoleValue());
+        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of(organizationId, Set.of(UserRole.USER));
@@ -63,7 +63,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndNoApprovedRolesForOrganizationShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of(UserRole.USER.getRoleValue());
+        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of(organizationId, Set.of());
@@ -76,7 +76,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndNoFilterForOrganizationShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of(UserRole.USER.getRoleValue());
+        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId1";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of("testOrganizationId2", Set.of(UserRole.USER));
@@ -90,8 +90,8 @@ class UserRoleFilteringServiceTest {
     @Test
     void givenKnownApprovedAndKnownUnapprovedAndUnknownRolesShouldReturnOnlyKnownApprovedUserRoles() {
         List<String> roleStringList = List.of(
-                UserRole.ADMIN.getRoleValue(),
-                UserRole.USER.getRoleValue(),
+                UserRole.ADMIN.getClaimValue(),
+                UserRole.USER.getClaimValue(),
                 "unknownRole1"
         );
         String organizationId = "testOrganizationId1";

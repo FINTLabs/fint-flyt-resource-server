@@ -71,7 +71,7 @@ class SecurityConfigurationIntegrationTest {
         tokenContainsOrgIdAndRoles(
                 UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
                 "domain-with-user-access.no",
-                List.of(role.getRoleValue())
+                List.of(role.getClaimValue())
         );
         webTestClient.get()
                 .uri("/api/intern/dummy")
@@ -100,7 +100,7 @@ class SecurityConfigurationIntegrationTest {
         tokenContainsOrgIdAndRoles(
                 UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
                 "domain-with-user-access.no",
-                List.of(role.getRoleValue())
+                List.of(role.getClaimValue())
         );
         webTestClient.get()
                 .uri("/api/internal/admin/dummy")
@@ -197,7 +197,7 @@ class SecurityConfigurationIntegrationTest {
         tokenContainsOrgIdAndRoles(
                 UUID.fromString("753b9bb2-de61-41e7-995d-615e393c8f2a"),
                 "domain-with-user-access.no",
-                List.of(UserRole.ADMIN.getRoleValue())
+                List.of(UserRole.ADMIN.getClaimValue())
         );
         webTestClient.get()
                 .uri("some/unknown/path")
