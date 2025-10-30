@@ -1,57 +1,72 @@
 package no.fintlabs.resourceserver.security.client.sourceapplication;
 
-import no.fintlabs.kafka.common.topic.TopicCleanupPolicyParameters;
-import no.fintlabs.kafka.requestreply.RequestProducer;
-import no.fintlabs.kafka.requestreply.RequestProducerFactory;
+import no.fintlabs.kafka.consuming.ListenerConfiguration;
 import no.fintlabs.kafka.requestreply.RequestProducerRecord;
-import no.fintlabs.kafka.requestreply.topic.ReplyTopicNameParameters;
+import no.fintlabs.kafka.requestreply.RequestTemplate;
+import no.fintlabs.kafka.requestreply.RequestTemplateFactory;
 import no.fintlabs.kafka.requestreply.topic.ReplyTopicService;
-import no.fintlabs.kafka.requestreply.topic.RequestTopicNameParameters;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import no.fintlabs.kafka.requestreply.topic.configuration.ReplyTopicConfiguration;
+import no.fintlabs.kafka.requestreply.topic.name.ReplyTopicNameParameters;
+import no.fintlabs.kafka.requestreply.topic.name.RequestTopicNameParameters;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
 public class SourceApplicationAuthorizationRequestService {
 
     private final RequestTopicNameParameters requestTopicNameParameters;
-    private final RequestProducer<String, SourceApplicationAuthorization> requestProducer;
+    private final RequestTemplate<String, SourceApplicationAuthorization> requestTemplate;
 
     public SourceApplicationAuthorizationRequestService(
             @Value("${fint.kafka.application-id}") String applicationId,
-            RequestProducerFactory requestProducerFactory,
+            RequestTemplateFactory requestTemplateFactory,
             ReplyTopicService replyTopicService
     ) {
         requestTopicNameParameters = RequestTopicNameParameters
                 .builder()
-                .resource("authorization")
+                .resourceName("authorization")
                 .parameterName("client-id")
                 .build();
 
         ReplyTopicNameParameters replyTopicNameParameters = ReplyTopicNameParameters
                 .builder()
                 .applicationId(applicationId)
-                .resource("authorization")
+                .resourceName("authorization")
                 .build();
-        replyTopicService.ensureTopic(replyTopicNameParameters, 0, TopicCleanupPolicyParameters.builder().build());
+        replyTopicService.createOrModifyTopic(
+                replyTopicNameParameters,
+                ReplyTopicConfiguration.builder()
+                        .retentionTime(Duration.ofMinutes(2))
+                        .build()
+        );
 
-        this.requestProducer = requestProducerFactory.createProducer(
+        this.requestTemplate = requestTemplateFactory.createTemplate(
                 replyTopicNameParameters,
                 String.class,
-                SourceApplicationAuthorization.class
+                SourceApplicationAuthorization.class,
+                Duration.ofSeconds(5),
+                ListenerConfiguration.stepBuilder()
+                        .groupIdApplicationDefault()
+                        .maxPollRecordsKafkaDefault()
+                        .maxPollIntervalKafkaDefault()
+                        .continueFromPreviousOffsetOnAssignment()
+                        .build()
         );
     }
 
     public Optional<SourceApplicationAuthorization> getClientAuthorization(String clientId) {
-        return requestProducer.requestAndReceive(
-                RequestProducerRecord
-                        .<String>builder()
-                        .topicNameParameters(requestTopicNameParameters)
-                        .value(clientId)
-                        .build()
-        ).map(ConsumerRecord::value);
+        return Optional.ofNullable(
+                requestTemplate.requestAndReceive(
+                        RequestProducerRecord
+                                .<String>builder()
+                                .topicNameParameters(requestTopicNameParameters)
+                                .value(clientId)
+                                .build()
+                ).value()
+        );
     }
 
 }
