@@ -1,6 +1,7 @@
 package no.fintlabs.resourceserver.security;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheConfiguration;
 import no.fintlabs.resourceserver.UrlPaths;
 import no.fintlabs.resourceserver.security.client.InternalClientJwtConverter;
@@ -10,6 +11,8 @@ import no.fintlabs.resourceserver.security.properties.InternalApiSecurityPropert
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
 import no.fintlabs.resourceserver.security.user.UserJwtConverter;
 import no.fintlabs.resourceserver.security.user.UserRole;
+import no.fintlabs.resourceserver.security.user.UserRoleFilteringService;
+import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,6 +34,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @EnableWebFluxSecurity
 @Import(FintCacheConfiguration.class)
@@ -42,6 +46,28 @@ public class SecurityConfiguration {
     @ConfigurationProperties("fint.flyt.resource-server.security.api.internal")
     InternalApiSecurityProperties internalApiSecurityProperties() {
         return new InternalApiSecurityProperties();
+    }
+
+    @Bean
+    @ConditionalOnBean(InternalApiSecurityProperties.class)
+    UserRoleFilteringService userRoleFilteringService(InternalApiSecurityProperties internalApiSecurityProperties) {
+        return new UserRoleFilteringService(internalApiSecurityProperties);
+    }
+
+    @Bean
+    @ConditionalOnBean(UserRoleFilteringService.class)
+    UserJwtConverter userJwtConverter(
+            FintCache<UUID, UserPermission> userPermissionCache,
+            UserRoleFilteringService userRoleFilteringService,
+            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService,
+            RoleAuthorityMappingService roleAuthorityMappingService
+    ) {
+        return new UserJwtConverter(
+                userPermissionCache,
+                userRoleFilteringService,
+                sourceApplicationAuthorityMappingService,
+                roleAuthorityMappingService
+        );
     }
 
     @Bean
@@ -76,7 +102,7 @@ public class SecurityConfiguration {
 
     @Order(1)
     @Bean
-    @ConditionalOnBean(InternalApiSecurityProperties.class)
+    @ConditionalOnBean(UserJwtConverter.class)
     SecurityWebFilterChain internalAdminApiFilterChain(
             ServerHttpSecurity http,
             UserJwtConverter userJwtConverter,
@@ -119,7 +145,6 @@ public class SecurityConfiguration {
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
             InternalClientJwtConverter internalClientJwtConverter,
             ClientAuthorityMappingService clientAuthorityMappingService
-
     ) {
         return createFilterChain(
                 http,

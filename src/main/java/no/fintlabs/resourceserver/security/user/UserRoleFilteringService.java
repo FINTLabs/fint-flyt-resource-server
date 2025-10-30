@@ -3,7 +3,6 @@ package no.fintlabs.resourceserver.security.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserRoleFilteringService {

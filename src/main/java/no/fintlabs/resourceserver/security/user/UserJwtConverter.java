@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
