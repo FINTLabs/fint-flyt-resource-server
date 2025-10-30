@@ -15,8 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +30,6 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
     private final RoleAuthorityMappingService roleAuthorityMappingService;
 
-    // TODO: Check that errors are sent with mono, not thrown directly, in other converters
     @Nonnull
     public Mono<AbstractAuthenticationToken> convert(@Nonnull Jwt jwt) {
         try {
@@ -47,17 +45,17 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
 
             UUID objectIdentifier = UUID.fromString(objectIdentifierString);
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
+            Set<GrantedAuthority> authorities = new HashSet<>();
 
             userPermissionCache.getOptional(objectIdentifier)
                     .map(UserPermission::getSourceApplicationIds)
                     .map(sourceApplicationAuthorityMappingService::createSourceApplicationAuthorities)
                     .ifPresent(authorities::addAll);
 
-            List<String> rolesStringList = jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
-            log.debug("Extracted roles from JWT: {}", rolesStringList);
-            if (!rolesStringList.isEmpty()) {
-                Set<UserRole> filteredUserRoles = userRoleFilteringService.filter(rolesStringList, organizationId);
+            Set<String> roleValues = Set.copyOf(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName()));
+            log.debug("Extracted roles from JWT: {}", roleValues);
+            if (!roleValues.isEmpty()) {
+                Set<UserRole> filteredUserRoles = userRoleFilteringService.filter(roleValues, organizationId);
                 authorities.addAll(roleAuthorityMappingService.createRoleAuthorities(filteredUserRoles));
             }
             return Mono.just(new JwtAuthenticationToken(jwt, authorities));

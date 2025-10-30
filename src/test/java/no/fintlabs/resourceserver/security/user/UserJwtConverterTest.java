@@ -112,21 +112,20 @@ class UserJwtConverterTest {
                 .thenReturn(objectIdentifier.toString());
 
         UserPermission userPermission = mock(UserPermission.class);
-        List<Long> sourceApplicationIds = List.of(1234L);
+        Set<Long> sourceApplicationIds = Set.of(1234L);
         when(userPermission.getSourceApplicationIds())
                 .thenReturn(sourceApplicationIds);
 
         GrantedAuthority sourceApplicationAuthority1 = mock(GrantedAuthority.class);
         GrantedAuthority sourceApplicationAuthority2 = mock(GrantedAuthority.class);
-        when(sourceApplicationAuthorityMappingService.createSourceApplicationAuthorities(sourceApplicationIds)).thenReturn(List.of(
-                sourceApplicationAuthority1, sourceApplicationAuthority2
-        ));
+        when(sourceApplicationAuthorityMappingService.createSourceApplicationAuthorities(sourceApplicationIds))
+                .thenReturn(Set.of(sourceApplicationAuthority1, sourceApplicationAuthority2));
 
         when(userPermissionCache.getOptional(objectIdentifier))
                 .thenReturn(Optional.of(userPermission));
 
-        List<String> roleClaims = List.of("TEST_ROLE_1", "TEST_ROLE_2");
-        when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(roleClaims);
+        Set<String> roleClaims = Set.of("TEST_ROLE_1", "TEST_ROLE_2");
+        when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(roleClaims.stream().toList());
 
         Set<UserRole> filteredUserRoles = Set.of(UserRole.USER);
         when(userRoleFilteringService.filter(roleClaims, "testOrganizationId"))
@@ -134,7 +133,7 @@ class UserJwtConverterTest {
 
         GrantedAuthority roleAuthority = mock(GrantedAuthority.class);
         when(roleAuthorityMappingService.createRoleAuthorities(filteredUserRoles))
-                .thenReturn(List.of(roleAuthority));
+                .thenReturn(Set.of(roleAuthority));
 
         StepVerifier.create(converter.convert(jwt))
                 .assertNext(authentication -> {

@@ -8,8 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import static no.fintlabs.resourceserver.security.AuthorityMappingService.AUTHORITY_DELIMITER;
@@ -36,7 +34,7 @@ public class AuthorityMappingServiceTest {
         AuthorityPrefix prefix1 = AuthorityPrefix.CLIENT_ID;
         AuthorityPrefix prefix2 = AuthorityPrefix.ROLE;
 
-        Collection<GrantedAuthority> authorities = List.of(
+        Set<GrantedAuthority> authorities = Set.of(
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + 1L),
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + 2L),
                 new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + 3L)
@@ -53,7 +51,7 @@ public class AuthorityMappingServiceTest {
         AuthorityPrefix prefix1 = AuthorityPrefix.CLIENT_ID;
         AuthorityPrefix prefix2 = AuthorityPrefix.ROLE;
 
-        List<SimpleGrantedAuthority> authorities = List.of(
+        Set<SimpleGrantedAuthority> authorities = Set.of(
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + "a"),
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + "b"),
                 new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + "c")

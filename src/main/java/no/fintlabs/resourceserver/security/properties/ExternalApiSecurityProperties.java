@@ -2,11 +2,11 @@ package no.fintlabs.resourceserver.security.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,5 +16,5 @@ import java.util.List;
 public class ExternalApiSecurityProperties {
     private boolean enabled;
     // TODO: Rename to authorizedSourceApplicationIds
-    private List<Long> authorizedClientIds;
+    private Set<Long> authorizedClientIds;
 }

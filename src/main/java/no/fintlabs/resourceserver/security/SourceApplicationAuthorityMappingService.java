@@ -6,7 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -14,18 +15,20 @@ public class SourceApplicationAuthorityMappingService {
 
     private final AuthorityMappingService authorityMappingService;
 
-    public List<GrantedAuthority> createSourceApplicationAuthorities(Collection<Long> sourceApplicationIds) {
-        return sourceApplicationIds.stream().map(this::createSourceApplicationAuthority).toList();
+    public Set<GrantedAuthority> createSourceApplicationAuthorities(Collection<Long> sourceApplicationIds) {
+        return sourceApplicationIds.stream()
+                .map(this::createSourceApplicationAuthority)
+                .collect(Collectors.toSet());
     }
 
     public GrantedAuthority createSourceApplicationAuthority(Long sourceApplicationId) {
         return new SimpleGrantedAuthority(createSourceApplicationAuthorityString(sourceApplicationId));
     }
 
-    public List<String> createSourceApplicationAuthorityStrings(Collection<Long> sourceApplicationIds) {
+    public Set<String> createSourceApplicationAuthorityStrings(Collection<Long> sourceApplicationIds) {
         return sourceApplicationIds.stream()
                 .map(this::createSourceApplicationAuthorityString)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     public String createSourceApplicationAuthorityString(Long sourceApplicationId) {

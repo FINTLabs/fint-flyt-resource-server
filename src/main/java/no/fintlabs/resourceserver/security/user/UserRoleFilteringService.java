@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ public class UserRoleFilteringService {
 
     private final InternalApiSecurityProperties internalApiSecurityProperties;
 
-    public Set<UserRole> filter(List<String> roleValues, String organizationId) {
+    public Set<UserRole> filter(Collection<String> roleValues, String organizationId) {
         if (roleValues.isEmpty()) {
             return Collections.emptySet();
         }

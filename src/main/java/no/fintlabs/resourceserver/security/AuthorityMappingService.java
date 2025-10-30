@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Service
 public class AuthorityMappingService {
 
-    public static String AUTHORITY_DELIMITER = "_";
+    public static final String AUTHORITY_DELIMITER = "_";
 
     public String toAuthority(AuthorityPrefix prefix, String value) {
         return prefix.getValue() + AUTHORITY_DELIMITER + value;

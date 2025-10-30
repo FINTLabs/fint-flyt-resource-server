@@ -6,7 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,10 +19,10 @@ public class ClientAuthorityMappingService {
         return new SimpleGrantedAuthority(createInternalClientIdAuthorityString(clientId));
     }
 
-    public List<String> createInternalClientIdAuthorityStrings(Collection<String> clientIds) {
+    public Set<String> createInternalClientIdAuthorityStrings(Collection<String> clientIds) {
         return clientIds.stream()
                 .map(this::createInternalClientIdAuthorityString)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     public String createInternalClientIdAuthorityString(String clientId) {

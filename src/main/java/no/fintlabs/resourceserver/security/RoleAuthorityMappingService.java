@@ -7,7 +7,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -15,20 +16,20 @@ public class RoleAuthorityMappingService {
 
     private final AuthorityMappingService authorityMappingService;
 
-    public List<GrantedAuthority> createRoleAuthorities(Collection<UserRole> roles) {
+    public Set<GrantedAuthority> createRoleAuthorities(Collection<UserRole> roles) {
         return roles.stream()
                 .map(this::createRoleAuthority)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     public GrantedAuthority createRoleAuthority(UserRole role) {
         return new SimpleGrantedAuthority(createRoleAuthorityString(role));
     }
 
-    public List<String> createRoleAuthorityStrings(Collection<UserRole> roles) {
+    public Set<String> createRoleAuthorityStrings(Collection<UserRole> roles) {
         return roles.stream()
                 .map(this::createRoleAuthorityString)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     public String createRoleAuthorityString(UserRole role) {

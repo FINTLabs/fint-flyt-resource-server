@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,5 +15,5 @@ import java.util.List;
 @NoArgsConstructor
 public class InternalClientApiSecurityProperties {
     private boolean enabled;
-    private List<String> authorizedClientIds;
+    private Set<String> authorizedClientIds;
 }

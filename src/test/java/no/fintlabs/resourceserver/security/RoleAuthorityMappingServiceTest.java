@@ -10,7 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -27,12 +27,12 @@ public class RoleAuthorityMappingServiceTest {
 
     @Test
     void createRoleAuthorities() {
-        Collection<UserRole> roles = List.of(UserRole.USER, UserRole.DEVELOPER);
+        Collection<UserRole> roles = Set.of(UserRole.USER, UserRole.DEVELOPER);
 
         when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.USER.name())).thenReturn("ROLE_USER");
         when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.DEVELOPER.name())).thenReturn("ROLE_DEVELOPER");
 
-        List<GrantedAuthority> roleAuthorities = roleAuthorityMappingService.createRoleAuthorities(roles);
+        Set<GrantedAuthority> roleAuthorities = roleAuthorityMappingService.createRoleAuthorities(roles);
 
         assertThat(roleAuthorities)
                 .extracting(GrantedAuthority::getAuthority)

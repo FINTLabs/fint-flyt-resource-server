@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +27,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenNoRolesShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of();
+        Set<String> roleStringList = Set.of();
         String organizationId = "testOrganizationId";
 
         Set<UserRole> filter = userRoleFilteringService.filter(roleStringList, organizationId);
@@ -39,7 +38,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenUnknownRolesShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of("unknownRole1", "unknownRole2");
+        Set<String> roleStringList = Set.of("unknownRole1", "unknownRole2");
         String organizationId = "testOrganizationId";
 
         Set<UserRole> filter = userRoleFilteringService.filter(roleStringList, organizationId);
@@ -50,7 +49,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndApprovedForOrganizationShouldReturnUserRole() {
-        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
+        Set<String> roleStringList = Set.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of(organizationId, Set.of(UserRole.USER));
@@ -63,7 +62,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndNoApprovedRolesForOrganizationShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
+        Set<String> roleStringList = Set.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of(organizationId, Set.of());
@@ -76,7 +75,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownRoleAndNoFilterForOrganizationShouldReturnNoUserRoles() {
-        List<String> roleStringList = List.of(UserRole.USER.getClaimValue());
+        Set<String> roleStringList = Set.of(UserRole.USER.getClaimValue());
         String organizationId = "testOrganizationId1";
 
         Map<String, Set<UserRole>> userRolesFilterPerOrgId = Map.of("testOrganizationId2", Set.of(UserRole.USER));
@@ -89,7 +88,7 @@ class UserRoleFilteringServiceTest {
 
     @Test
     void givenKnownApprovedAndKnownUnapprovedAndUnknownRolesShouldReturnOnlyKnownApprovedUserRoles() {
-        List<String> roleStringList = List.of(
+        Set<String> roleStringList = Set.of(
                 UserRole.ADMIN.getClaimValue(),
                 UserRole.USER.getClaimValue(),
                 "unknownRole1"

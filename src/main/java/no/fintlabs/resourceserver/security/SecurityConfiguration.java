@@ -133,18 +133,6 @@ public class SecurityConfiguration {
         );
     }
 
-    // TODO:
-    //  INTERNAL CLIENT
-    //  – Token med clientId (183812y7398172389)
-    //  – Setter authority CLIENT_ID_183812y7398172389
-    //  – Validerer at authorizedClientId i properties i applikasjonen er satt til 183812y7398172389
-    //  EXTERNAL CLIENT
-    //  – Token med clientId (183812y7398172389)
-    //  – Sender clientId til authorization-service og får tilbake evt source application id (2)
-    //  – Setter source application id (2) som authority (SOURCE_APPLICATION_ID_2)
-    //  – Validerer at authorizedClientId (bytt navn) i properties i applikasjonen er satt til 2
-
-
     @Order(4)
     @Bean
     @ConditionalOnBean(ExternalApiSecurityProperties.class)
