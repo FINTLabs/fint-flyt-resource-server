@@ -40,7 +40,7 @@ dependencies {
     implementation 'io.netty:netty-resolver-dns-native-macos:4.2.6.Final:osx-aarch_64'
 
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'no.fintlabs:fint-kafka:5.0.0-rc-12'
+    implementation 'no.fintlabs:fint-kafka:5.0.0-rc-14'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'no.fintlabs:fint-flyt-cache:1.2.5'
