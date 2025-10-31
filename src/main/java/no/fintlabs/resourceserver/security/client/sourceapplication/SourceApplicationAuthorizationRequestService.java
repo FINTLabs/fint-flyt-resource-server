@@ -8,6 +8,7 @@ import no.fintlabs.kafka.requestreply.topic.ReplyTopicService;
 import no.fintlabs.kafka.requestreply.topic.configuration.ReplyTopicConfiguration;
 import no.fintlabs.kafka.requestreply.topic.name.ReplyTopicNameParameters;
 import no.fintlabs.kafka.requestreply.topic.name.RequestTopicNameParameters;
+import no.fintlabs.kafka.topic.name.TopicNamePrefixParameters;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +28,24 @@ public class SourceApplicationAuthorizationRequestService {
     ) {
         requestTopicNameParameters = RequestTopicNameParameters
                 .builder()
+                .topicNamePrefixParameters(TopicNamePrefixParameters
+                        .builder()
+                        .orgIdApplicationDefault()
+                        .domainContextApplicationDefault()
+                        .build()
+                )
                 .resourceName("authorization")
                 .parameterName("client-id")
                 .build();
 
         ReplyTopicNameParameters replyTopicNameParameters = ReplyTopicNameParameters
                 .builder()
+                .topicNamePrefixParameters(TopicNamePrefixParameters
+                        .builder()
+                        .orgIdApplicationDefault()
+                        .domainContextApplicationDefault()
+                        .build()
+                )
                 .applicationId(applicationId)
                 .resourceName("authorization")
                 .build();
