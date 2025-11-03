@@ -18,6 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
@@ -43,6 +44,7 @@ import java.util.UUID;
 @EnableWebFluxSecurity
 @Import(FintCacheConfiguration.class)
 @Slf4j
+@Configuration
 public class SecurityConfiguration {
 
     @Bean
