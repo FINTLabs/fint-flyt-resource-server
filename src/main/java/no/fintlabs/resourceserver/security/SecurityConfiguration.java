@@ -30,7 +30,9 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
+import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -95,8 +97,7 @@ public class SecurityConfiguration {
     @Order(0)
     @Bean
     SecurityWebFilterChain tenantActuatorSecurityFilterChain(ServerHttpSecurity http, WebFluxProperties props) {
-        String pattern = resolveTenantAwarePath("/actuator", props) + "/**";
-        return http.securityMatcher(new PathPatternParserServerWebExchangeMatcher(pattern))
+        return http.securityMatcher(matcherFor("/actuator", props))
                 .authorizeExchange(spec -> spec.anyExchange().permitAll())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
@@ -199,18 +200,23 @@ public class SecurityConfiguration {
                 .build();
     }
 
-    private String resolveTenantAwarePath(String path, WebFluxProperties props) {
-        String normalisedPath = path.startsWith("/") ? path : "/" + path;
+    private ServerWebExchangeMatcher matcherFor(String path, WebFluxProperties props) {
+        String normalized = path.startsWith("/") ? path : "/" + path;
+        ServerWebExchangeMatcher plain = new PathPatternParserServerWebExchangeMatcher(normalized + "/**");
+
         String base = props.getBasePath();
         if (!StringUtils.hasText(base)) {
-            return normalisedPath;
+            return plain;
         }
-        String normalisedBase = base.startsWith("/") ? base : "/" + base;
-        normalisedBase = StringUtils.trimTrailingCharacter(normalisedBase, '/');
-        if (normalisedBase.isEmpty()) {
-            return normalisedPath;
-        }
-        return normalisedBase + normalisedPath;
+
+        String prefixed = StringUtils.trimTrailingCharacter(
+                (base.startsWith("/") ? base : "/" + base), '/'
+        ) + normalized + "/**";
+
+        return new OrServerWebExchangeMatcher(
+                plain,
+                new PathPatternParserServerWebExchangeMatcher(prefixed)
+        );
     }
 
     private SecurityWebFilterChain createFilterChain(ServerHttpSecurity http,
@@ -218,7 +224,7 @@ public class SecurityConfiguration {
                                                      String path,
                                                      Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
                                                      ReactiveAuthorizationManager<AuthorizationContext> manager) {
-        http.securityMatcher(new PathPatternParserServerWebExchangeMatcher(resolveTenantAwarePath(path, props) + "/**"))
+        http.securityMatcher(matcherFor(path, props))
                 .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
         return http.oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
                 .authorizeExchange(exchange -> exchange.anyExchange().access(manager))
