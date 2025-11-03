@@ -32,9 +32,18 @@ public class UserAuthorizationService {
         if (!getUserAuthorizedSourceApplicationIds(authentication).contains(sourceApplicationId)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "You do not have permission to access or modify data that is related to source application with id=" + sourceApplicationId
+                    "You do not have permission to access or modify data that is related to source application with id="
+                    + sourceApplicationId
             );
         }
+    }
+
+    public boolean userHasRole(UserRole role, Authentication authentication) {
+        return authorityMappingService.extractStringValues(
+                AuthorityPrefix.ROLE,
+                authentication.getAuthorities()
+        ).contains(role.name());
+
     }
 
 }

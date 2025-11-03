@@ -29,11 +29,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,6 +196,8 @@ class SecurityConfigurationIntegrationTest {
                         .tokenType(TokenType.PERSONAL_TOKEN_WITH_ORG_ID_AND_OBJ_ID_AND_DEVELOPER_ROLE)
                         .expectedResponseHttpStatus(HttpStatus.OK)
                         .expectedAuthorities(Set.of(
+                                "ROLE_USER",
+                                "ROLE_ADMIN",
                                 "ROLE_DEVELOPER",
                                 "SOURCE_APPLICATION_ID_1",
                                 "SOURCE_APPLICATION_ID_2"
@@ -216,6 +214,7 @@ class SecurityConfigurationIntegrationTest {
                         .tokenType(TokenType.PERSONAL_TOKEN_WITH_ORG_ID_AND_OBJ_ID_AND_ADMIN_ROLE)
                         .expectedResponseHttpStatus(HttpStatus.OK)
                         .expectedAuthorities(Set.of(
+                                "ROLE_USER",
                                 "ROLE_ADMIN",
                                 "SOURCE_APPLICATION_ID_1",
                                 "SOURCE_APPLICATION_ID_2"
@@ -252,6 +251,8 @@ class SecurityConfigurationIntegrationTest {
                         .tokenType(TokenType.PERSONAL_TOKEN_WITH_ORG_ID_AND_OBJ_ID_AND_DEVELOPER_ROLE)
                         .expectedResponseHttpStatus(HttpStatus.OK)
                         .expectedAuthorities(Set.of(
+                                "ROLE_USER",
+                                "ROLE_ADMIN",
                                 "ROLE_DEVELOPER",
                                 "SOURCE_APPLICATION_ID_1",
                                 "SOURCE_APPLICATION_ID_2"
@@ -268,6 +269,7 @@ class SecurityConfigurationIntegrationTest {
                         .tokenType(TokenType.PERSONAL_TOKEN_WITH_ORG_ID_AND_OBJ_ID_AND_ADMIN_ROLE)
                         .expectedResponseHttpStatus(HttpStatus.OK)
                         .expectedAuthorities(Set.of(
+                                "ROLE_USER",
                                 "ROLE_ADMIN",
                                 "SOURCE_APPLICATION_ID_1",
                                 "SOURCE_APPLICATION_ID_2"

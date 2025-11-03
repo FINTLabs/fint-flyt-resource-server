@@ -21,10 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DirtiesContext
@@ -38,6 +35,8 @@ class UserJwtConverterTest {
     private RoleAuthorityMappingService roleAuthorityMappingService;
     @Mock
     private UserRoleFilteringService userRoleFilteringService;
+    @Mock
+    private RoleHierarchyService roleHierarchyService;
     @InjectMocks
     private UserJwtConverter converter;
     @Mock
@@ -127,12 +126,14 @@ class UserJwtConverterTest {
         Set<String> roleClaims = Set.of("TEST_ROLE_1", "TEST_ROLE_2");
         when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(roleClaims.stream().toList());
 
-        Set<UserRole> filteredUserRoles = Set.of(UserRole.USER);
         when(userRoleFilteringService.filter(roleClaims, "testOrganizationId"))
-                .thenReturn(filteredUserRoles);
+                .thenReturn(Set.of(UserRole.ADMIN));
+
+        when(roleHierarchyService.getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN)))
+                .thenReturn(Set.of(UserRole.ADMIN, UserRole.USER));
 
         GrantedAuthority roleAuthority = mock(GrantedAuthority.class);
-        when(roleAuthorityMappingService.createRoleAuthorities(filteredUserRoles))
+        when(roleAuthorityMappingService.createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER)))
                 .thenReturn(Set.of(roleAuthority));
 
         StepVerifier.create(converter.convert(jwt))
@@ -155,13 +156,15 @@ class UserJwtConverterTest {
         verify(userPermissionCache).getOptional(objectIdentifier);
         verify(jwt).getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
         verify(userRoleFilteringService).filter(roleClaims, "testOrganizationId");
-        verify(roleAuthorityMappingService).createRoleAuthorities(filteredUserRoles);
+        verify(roleHierarchyService).getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN));
+        verify(roleAuthorityMappingService).createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER));
         verifyNoMoreInteractions(
                 userPermission,
                 roleAuthorityMappingService,
                 sourceApplicationAuthorityMappingService,
                 userPermissionCache,
-                userRoleFilteringService
+                userRoleFilteringService,
+                roleHierarchyService
         );
     }
 }

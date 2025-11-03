@@ -37,7 +37,8 @@ public class AuthorityMappingServiceTest {
         Set<GrantedAuthority> authorities = Set.of(
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + 1L),
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + 2L),
-                new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + 3L)
+                new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + 3L),
+                new SimpleGrantedAuthority(String.valueOf(4L))
         );
         Set<Long> longs = authorityMappingService.extractLongValues(prefix1, authorities);
 
@@ -54,7 +55,8 @@ public class AuthorityMappingServiceTest {
         Set<SimpleGrantedAuthority> authorities = Set.of(
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + "a"),
                 new SimpleGrantedAuthority(prefix1.getValue() + AUTHORITY_DELIMITER + "b"),
-                new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + "c")
+                new SimpleGrantedAuthority(prefix2.getValue() + AUTHORITY_DELIMITER + "c"),
+                new SimpleGrantedAuthority("d")
         );
         Set<String> strings = authorityMappingService.extractStringValues(AuthorityPrefix.CLIENT_ID, authorities);
 

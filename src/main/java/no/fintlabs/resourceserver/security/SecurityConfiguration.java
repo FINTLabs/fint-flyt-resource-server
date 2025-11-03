@@ -9,6 +9,7 @@ import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplic
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
+import no.fintlabs.resourceserver.security.user.RoleHierarchyService;
 import no.fintlabs.resourceserver.security.user.UserJwtConverter;
 import no.fintlabs.resourceserver.security.user.UserRole;
 import no.fintlabs.resourceserver.security.user.UserRoleFilteringService;
@@ -37,8 +38,6 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @EnableWebFluxSecurity
@@ -66,12 +65,14 @@ public class SecurityConfiguration {
             FintCache<UUID, UserPermission> userPermissionCache,
             UserRoleFilteringService userRoleFilteringService,
             SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService,
+            RoleHierarchyService roleHierarchyService,
             RoleAuthorityMappingService roleAuthorityMappingService
     ) {
         return new UserJwtConverter(
                 userPermissionCache,
                 userRoleFilteringService,
                 sourceApplicationAuthorityMappingService,
+                roleHierarchyService,
                 roleAuthorityMappingService
         );
     }
@@ -90,11 +91,6 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
-    private static final Map<UserRole, Set<UserRole>> ROLE_HIERARCHY = Map.of(
-            UserRole.USER, Set.of(UserRole.USER, UserRole.DEVELOPER, UserRole.ADMIN),
-            UserRole.DEVELOPER, Set.of(UserRole.DEVELOPER),
-            UserRole.ADMIN, Set.of(UserRole.ADMIN, UserRole.DEVELOPER)
-    );
 
     @Order(0)
     @Bean
@@ -119,9 +115,8 @@ public class SecurityConfiguration {
                 props,
                 UrlPaths.INTERNAL_ADMIN_API,
                 userJwtConverter,
-                AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.ADMIN))
-                                .toArray(new String[0])
+                AuthorityReactiveAuthorizationManager.hasAuthority(
+                        roleAuthorityMappingService.createRoleAuthorityString(UserRole.ADMIN)
                 )
         );
     }
@@ -140,8 +135,8 @@ public class SecurityConfiguration {
                 props,
                 UrlPaths.INTERNAL_API,
                 userJwtConverter,
-                AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        roleAuthorityMappingService.createRoleAuthorityStrings(ROLE_HIERARCHY.get(UserRole.USER)).toArray(new String[0])
+                AuthorityReactiveAuthorizationManager.hasAuthority(
+                        roleAuthorityMappingService.createRoleAuthorityString(UserRole.USER)
                 )
         );
     }

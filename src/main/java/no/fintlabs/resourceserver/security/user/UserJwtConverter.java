@@ -26,6 +26,7 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     private final FintCache<UUID, UserPermission> userPermissionCache;
     private final UserRoleFilteringService userRoleFilteringService;
     private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
+    private final RoleHierarchyService roleHierarchyService;
     private final RoleAuthorityMappingService roleAuthorityMappingService;
 
     @Nonnull
@@ -54,7 +55,8 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
             log.debug("Extracted roles from JWT: {}", roleValues);
             if (!roleValues.isEmpty()) {
                 Set<UserRole> filteredUserRoles = userRoleFilteringService.filter(roleValues, organizationId);
-                authorities.addAll(roleAuthorityMappingService.createRoleAuthorities(filteredUserRoles));
+                Set<UserRole> providedAndImpliedRoles = roleHierarchyService.getProvidedAndImpliedRoles(filteredUserRoles);
+                authorities.addAll(roleAuthorityMappingService.createRoleAuthorities(providedAndImpliedRoles));
             }
             return Mono.just(new JwtAuthenticationToken(jwt, authorities));
         } catch (Exception e) {
