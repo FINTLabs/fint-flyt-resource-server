@@ -297,26 +297,48 @@ class SecurityConfigurationIntegrationTest {
                         .expectedResponseHttpStatus(HttpStatus.FORBIDDEN)
                         .build(),
 
-                // EXTERNAL CLIENT API
+                // ACTUATOR ENDPOINTS
                 TestParameters
                         .builder()
-                        .description("External API – No token")
-                        .path(UrlPaths.EXTERNAL_API)
+                        .description("Actuator API – No token")
+                        .path("/actuator/")
+                        .tokenType(TokenType.NO_TOKEN)
+                        .expectedResponseHttpStatus(HttpStatus.OK)
+                        .build(),
+                TestParameters
+                        .builder()
+                        .description("Actuator API – Valid Client Token")
+                        .path("/actuator/")
+                        .tokenType(TokenType.CLIENT_TOKEN_WITH_AUTHORIZED_EXTERNAL_CLIENT_ID)
+                        .expectedResponseHttpStatus(HttpStatus.OK)
+                        .build(),
+                TestParameters
+                        .builder()
+                        .description("Actuator API – Invalid Client Token")
+                        .path("/actuator/")
+                        .tokenType(TokenType.CLIENT_TOKEN_WITH_UNAUTHORIZED_CLIENT_ID)
+                        .expectedResponseHttpStatus(HttpStatus.OK)
+                        .build(),
+
+                // UNKNOWN API (global catch all chain)
+                TestParameters
+                        .builder()
+                        .description("Unknown API – No token")
+                        .path("/path/do/not/exist")
                         .tokenType(TokenType.NO_TOKEN)
                         .expectedResponseHttpStatus(HttpStatus.UNAUTHORIZED)
                         .build(),
                 TestParameters
                         .builder()
-                        .description("External API – Valid Client Token")
-                        .path(UrlPaths.EXTERNAL_API)
-                        .tokenType(TokenType.CLIENT_TOKEN_WITH_AUTHORIZED_EXTERNAL_CLIENT_ID)
-                        .expectedResponseHttpStatus(HttpStatus.OK)
-                        .sourceApplicationAuthorizations(Map.of(AUTHORIZED_EXTERNAL_CLIENT_SUB, 1L))
+                        .description("Unknown API – Valid Client Token")
+                        .path("/path/do/not/exist")
+                        .tokenType(TokenType.CLIENT_TOKEN_WITH_AUTHORIZED_INTERNAL_CLIENT_ID)
+                        .expectedResponseHttpStatus(HttpStatus.UNAUTHORIZED)
                         .build(),
                 TestParameters
                         .builder()
-                        .description("External API – Invalid Client Token")
-                        .path(UrlPaths.EXTERNAL_API)
+                        .description("Unknown API – Invalid Client Token")
+                        .path("/path/do/not/exist")
                         .tokenType(TokenType.CLIENT_TOKEN_WITH_UNAUTHORIZED_CLIENT_ID)
                         .expectedResponseHttpStatus(HttpStatus.UNAUTHORIZED)
                         .build(),
