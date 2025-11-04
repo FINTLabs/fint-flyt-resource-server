@@ -23,13 +23,15 @@ public class ClientAuthorityMappingServiceTest {
 
     @Test
     void createInternalClientIdAuthority() {
-        String clientId = "something";
+        String clientId = "testClientIdValue";
 
-        when(authorityMappingService.toAuthority(AuthorityPrefix.CLIENT_ID, clientId)).thenReturn("CLIENT_ID_something");
+        when(authorityMappingService.toAuthority(AuthorityPrefix.CLIENT_ID, clientId))
+                .thenReturn("CLIENT_ID_testClientIdValue");
 
-        GrantedAuthority internalClientIdAuthority = clientAuthorityMappingService.createInternalClientIdAuthority(clientId);
+        GrantedAuthority internalClientIdAuthority =
+                clientAuthorityMappingService.createInternalClientIdAuthority(clientId);
 
-        assertThat(internalClientIdAuthority.getAuthority()).isEqualTo("CLIENT_ID_something");
+        assertThat(internalClientIdAuthority.getAuthority()).isEqualTo("CLIENT_ID_testClientIdValue");
 
     }
 

@@ -23,7 +23,7 @@ public class InternalClientJwtConverter implements Converter<Jwt, Mono<AbstractA
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt source) {
         return Mono.fromCallable(
-                () -> Optional.ofNullable(source.<String>getClaim("sub"))
+                () -> Optional.ofNullable(source.getSubject())
                         .map(clientAuthorityMappingService::createInternalClientIdAuthority)
                         .map(grantedAuthority -> new JwtAuthenticationToken(source, List.of(grantedAuthority)))
                         .orElseGet(() -> new JwtAuthenticationToken(source))

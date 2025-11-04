@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum AuthorityPrefix {
     ORG_ID("ORG_ID"),
     ROLE("ROLE"),
-    SOURCE_APPLICATION_ID("SOURCE_APPLICATION_ID"), // TODO 21/10/2025 eivindmorch: Separate source app client use and user access use?
+    SOURCE_APPLICATION_ID("SOURCE_APPLICATION_ID"),
     CLIENT_ID("CLIENT_ID");
 
     private final String value;

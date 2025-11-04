@@ -197,6 +197,7 @@ public class SecurityConfiguration {
                 .build();
     }
 
+    // TODO 04/11/2025 eivindmorch: Remove?
     private ServerWebExchangeMatcher matcherFor(String path, WebFluxProperties props) {
         String normalized = path.startsWith("/") ? path : "/" + path;
         ServerWebExchangeMatcher plain = new PathPatternParserServerWebExchangeMatcher(normalized + "/**");

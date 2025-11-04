@@ -29,8 +29,11 @@ public class RoleAuthorityMappingServiceTest {
     void createRoleAuthorities() {
         Collection<UserRole> roles = Set.of(UserRole.USER, UserRole.DEVELOPER);
 
-        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.USER.name())).thenReturn("ROLE_USER");
-        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.DEVELOPER.name())).thenReturn("ROLE_DEVELOPER");
+        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.USER.name()))
+                .thenReturn("ROLE_USER");
+
+        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.DEVELOPER.name()))
+                .thenReturn("ROLE_DEVELOPER");
 
         Set<GrantedAuthority> roleAuthorities = roleAuthorityMappingService.createRoleAuthorities(roles);
 
@@ -43,7 +46,8 @@ public class RoleAuthorityMappingServiceTest {
     void createRoleAuthority() {
         UserRole role = UserRole.USER;
 
-        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.USER.name())).thenReturn("ROLE_USER");
+        when(authorityMappingService.toAuthority(AuthorityPrefix.ROLE, UserRole.USER.name()))
+                .thenReturn("ROLE_USER");
 
         GrantedAuthority roleAuthority = roleAuthorityMappingService.createRoleAuthority(role);
 

@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -69,7 +70,7 @@ class SecurityConfigurationIntegrationTest {
 
     private static final String JWT_VALUE = "testJwtValue";
 
-    private static final String SUB_CLAIM_NAME = "sub";
+    private static final String SUB_CLAIM_NAME = JwtClaimNames.SUB;
 
     private static final UUID VALID_USER_OBJECT_IDENTIFIER = UUID.fromString("a3be307e-e8d4-4475-8ed0-8d948dc47b86");
 
@@ -161,17 +162,17 @@ class SecurityConfigurationIntegrationTest {
 
     public static Stream<TestParameters> testParameters() {
         return Stream.of(
-                // INTERNAL API
+                // INTERNAL USER API
                 TestParameters
                         .builder()
-                        .description("Internal API – No token")
+                        .description("Internal User API – No token")
                         .path(UrlPaths.INTERNAL_API)
                         .tokenType(TokenType.NO_TOKEN)
                         .expectedResponseHttpStatus(HttpStatus.UNAUTHORIZED)
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Internal API – User Role")
+                        .description("Internal User API – User Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -187,7 +188,7 @@ class SecurityConfigurationIntegrationTest {
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Internal API – Developer Role")
+                        .description("Internal User API – Developer Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -205,7 +206,7 @@ class SecurityConfigurationIntegrationTest {
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Internal API – Admin Role")
+                        .description("Internal User API – Admin Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -221,17 +222,17 @@ class SecurityConfigurationIntegrationTest {
                         ))
                         .build(),
 
-                // ADMIN API
+                // INTERNAL ADMIN API
                 TestParameters
                         .builder()
-                        .description("Admin API – No token")
+                        .description("Internal Admin API – No token")
                         .path(UrlPaths.INTERNAL_ADMIN_API)
                         .tokenType(TokenType.NO_TOKEN)
                         .expectedResponseHttpStatus(HttpStatus.UNAUTHORIZED)
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Admin API – User Role")
+                        .description("Internal Admin API – User Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -242,7 +243,7 @@ class SecurityConfigurationIntegrationTest {
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Admin API – Developer Role")
+                        .description("Internal Admin API – Developer Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -260,7 +261,7 @@ class SecurityConfigurationIntegrationTest {
                         .build(),
                 TestParameters
                         .builder()
-                        .description("Admin API – Admin Role")
+                        .description("Internal Admin API – Admin Role")
                         .userPermissions(Map.of(
                                 VALID_USER_OBJECT_IDENTIFIER,
                                 Set.of(1L, 2L)
@@ -298,6 +299,8 @@ class SecurityConfigurationIntegrationTest {
                         .tokenType(TokenType.CLIENT_TOKEN_WITH_UNAUTHORIZED_CLIENT_ID)
                         .expectedResponseHttpStatus(HttpStatus.FORBIDDEN)
                         .build(),
+
+                // TODO 04/11/2025 eivindmorch: External API
 
                 // ACTUATOR ENDPOINTS
                 TestParameters

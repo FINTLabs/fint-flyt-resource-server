@@ -23,10 +23,10 @@ public class AuthorityMappingServiceTest {
     @Test
     void givenAuthorityPrefixAndStringValueShouldReturnStringOfAuthorityPrefix() {
         AuthorityPrefix prefix = AuthorityPrefix.CLIENT_ID;
-        String value = "something";
+        String value = "testAuthorityValue";
         String authorityString = authorityMappingService.toAuthority(prefix, value);
 
-        assertThat(authorityString).isEqualTo("CLIENT_ID_something");
+        assertThat(authorityString).isEqualTo("CLIENT_ID_testAuthorityValue");
     }
 
     @Test

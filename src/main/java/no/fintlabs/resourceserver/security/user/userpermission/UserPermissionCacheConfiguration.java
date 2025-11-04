@@ -17,9 +17,7 @@ public class UserPermissionCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
 
-    public UserPermissionCacheConfiguration(
-            FintCacheManager fintCacheManager
-    ) {
+    public UserPermissionCacheConfiguration(FintCacheManager fintCacheManager) {
         this.fintCacheManager = fintCacheManager;
     }
 

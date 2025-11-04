@@ -2,6 +2,8 @@ package no.fintlabs.resourceserver.security.client.sourceapplication;
 
 import no.fintlabs.resourceserver.security.AuthorityMappingService;
 import no.fintlabs.resourceserver.security.AuthorityPrefix;
+import no.fintlabs.resourceserver.security.client.sourceapplication.exceptions.MultipleSourceApplicationIdsException;
+import no.fintlabs.resourceserver.security.client.sourceapplication.exceptions.NoSourceApplicationIdException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +25,10 @@ public class SourceApplicationAuthorizationService {
                 authentication.getAuthorities()
         );
         if (sourceApplicationIds.size() > 1) {
-            throw new IllegalStateException("More than one source application id found");
+            throw new MultipleSourceApplicationIdsException(sourceApplicationIds);
         }
         return sourceApplicationIds.stream().findFirst().orElseThrow(
-                () -> new IllegalStateException("No source application id found")
+                NoSourceApplicationIdException::new
         );
     }
 

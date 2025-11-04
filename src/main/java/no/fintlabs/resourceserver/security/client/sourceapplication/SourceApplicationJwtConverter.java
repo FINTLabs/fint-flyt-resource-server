@@ -14,22 +14,21 @@ import java.util.Optional;
 @Service
 public class SourceApplicationJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
-    private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
     private final SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService;
+    private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
 
     public SourceApplicationJwtConverter(
-            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService,
-            SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService
+            SourceApplicationAuthorizationRequestService sourceApplicationAuthorizationRequestService,
+            SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService
     ) {
-        this.sourceApplicationAuthorityMappingService = sourceApplicationAuthorityMappingService;
         this.sourceApplicationAuthorizationRequestService = sourceApplicationAuthorizationRequestService;
+        this.sourceApplicationAuthorityMappingService = sourceApplicationAuthorityMappingService;
     }
 
-    // TODO: Consider moving source app id to Authentication.name
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt source) {
         return Mono.fromCallable(
-                () -> Optional.ofNullable(source.<String>getClaim("sub"))
+                () -> Optional.ofNullable(source.getSubject())
                         .flatMap(sourceApplicationAuthorizationRequestService::getClientAuthorization)
                         .map(SourceApplicationAuthorization::getSourceApplicationId)
                         .map(sourceApplicationAuthorityMappingService::createSourceApplicationAuthority)

@@ -38,7 +38,7 @@ public class UserAuthorizationService {
         }
     }
 
-    public boolean userHasRole(UserRole role, Authentication authentication) {
+    public boolean userHasRole(Authentication authentication, UserRole role) {
         return authorityMappingService.extractStringValues(
                 AuthorityPrefix.ROLE,
                 authentication.getAuthorities()
