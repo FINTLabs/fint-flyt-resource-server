@@ -17,6 +17,9 @@ public class UserRoleFilteringService {
     private final InternalApiSecurityProperties internalApiSecurityProperties;
 
     public Set<UserRole> filter(Collection<String> roleValues, String organizationId) {
+
+        log.debug("roleValues : {}", roleValues);
+
         if (roleValues.isEmpty()) {
             return Collections.emptySet();
         }
@@ -28,6 +31,8 @@ public class UserRoleFilteringService {
                 .map(Optional::get)
                 .collect(Collectors.toSet());
 
+        log.debug("filteredUserRoles before filter : {}", filteredUserRoles);
+
         if (filteredUserRoles.isEmpty()) {
             return Collections.emptySet();
         }
@@ -35,7 +40,12 @@ public class UserRoleFilteringService {
         Set<UserRole> roleFilter = internalApiSecurityProperties.getUserRoleFilterPerOrgId()
                 .getOrDefault(organizationId, Collections.emptySet());
 
+        log.debug("roleFilter: {}", roleFilter);
+
         filteredUserRoles.retainAll(roleFilter);
+
+        log.debug("filteredUserRoles after filter : {}", filteredUserRoles);
+
         return filteredUserRoles;
     }
 }
