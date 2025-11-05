@@ -44,7 +44,7 @@ class UserJwtConverterTest {
 
     @Test
     void givenNoOrganizationIdClaimShouldThrowIllegalArgumentException() {
-        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn(null);
 
         StepVerifier.create(converter.convert(jwt))
@@ -57,7 +57,7 @@ class UserJwtConverterTest {
 
     @Test
     void givenNoObjectIdentifierClaimShouldThrowIllegalArgumentException() {
-        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn("testOrganizationId");
 
         StepVerifier.create(converter.convert(jwt))
@@ -70,16 +70,16 @@ class UserJwtConverterTest {
 
     @Test
     void givenValidJwtTokenWithoutUserPermissionAndRoleShouldReturnJwtAuthenticationTokenWithoutAuthorities() {
-        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn("testOrganizationId");
         UUID objectIdentifier = UUID.fromString("377cfaae-ef8f-4060-86b6-1cd083bfde07");
-        when(jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName()))
                 .thenReturn(objectIdentifier.toString());
 
         when(userPermissionCache.getOptional(objectIdentifier))
                 .thenReturn(Optional.empty());
 
-        when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(List.of());
+        when(jwt.getClaimAsStringList(UserClaim.ROLES.getTokenClaimName())).thenReturn(List.of());
 
         StepVerifier.create(converter.convert(jwt))
                 .assertNext(authentication -> {
@@ -90,10 +90,10 @@ class UserJwtConverterTest {
                 .expectComplete()
                 .verify();
 
-        verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName());
-        verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName());
+        verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName());
+        verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName());
         verify(userPermissionCache).getOptional(objectIdentifier);
-        verify(jwt).getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
+        verify(jwt).getClaimAsStringList(UserClaim.ROLES.getTokenClaimName());
         verifyNoMoreInteractions(
                 roleAuthorityMappingService,
                 sourceApplicationAuthorityMappingService,
@@ -104,10 +104,10 @@ class UserJwtConverterTest {
 
     @Test
     void givenValidJwtTokenWithUserPermissionAndRoleShouldReturnJwtAuthenticationTokenWithAuthorities() {
-        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn("testOrganizationId");
         UUID objectIdentifier = UUID.fromString("377cfaae-ef8f-4060-86b6-1cd083bfde07");
-        when(jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName()))
+        when(jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName()))
                 .thenReturn(objectIdentifier.toString());
 
         UserPermission userPermission = mock(UserPermission.class);
@@ -124,7 +124,7 @@ class UserJwtConverterTest {
                 .thenReturn(Optional.of(userPermission));
 
         Set<String> roleClaims = Set.of("TEST_ROLE_1", "TEST_ROLE_2");
-        when(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName())).thenReturn(roleClaims.stream().toList());
+        when(jwt.getClaimAsStringList(UserClaim.ROLES.getTokenClaimName())).thenReturn(roleClaims.stream().toList());
 
         when(userRoleFilteringService.filter(roleClaims, "testOrganizationId"))
                 .thenReturn(Set.of(UserRole.ADMIN));
@@ -149,12 +149,12 @@ class UserJwtConverterTest {
                 .expectComplete()
                 .verify();
 
-        verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName());
-        verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName());
+        verify(jwt).getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName());
+        verify(jwt).getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName());
         verify(userPermission).getSourceApplicationIds();
         verify(sourceApplicationAuthorityMappingService).createSourceApplicationAuthorities(sourceApplicationIds);
         verify(userPermissionCache).getOptional(objectIdentifier);
-        verify(jwt).getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName());
+        verify(jwt).getClaimAsStringList(UserClaim.ROLES.getTokenClaimName());
         verify(userRoleFilteringService).filter(roleClaims, "testOrganizationId");
         verify(roleHierarchyService).getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN));
         verify(roleAuthorityMappingService).createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER));

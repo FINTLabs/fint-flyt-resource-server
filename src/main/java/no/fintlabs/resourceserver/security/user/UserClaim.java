@@ -11,6 +11,6 @@ public enum UserClaim {
     ROLES("roles"),
     SOURCE_APPLICATION_IDS("sourceApplicationIds");
 
-    private final String jwtTokenClaimName;
+    private final String tokenClaimName;
 
 }

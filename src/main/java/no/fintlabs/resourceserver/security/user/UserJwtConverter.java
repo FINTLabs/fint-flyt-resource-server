@@ -33,12 +33,12 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     public Mono<AbstractAuthenticationToken> convert(@Nonnull Jwt jwt) {
         try {
             String organizationId = Optional.ofNullable(
-                    jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getJwtTokenClaimName())
+                    jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName())
             ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.ORGANIZATION_ID));
             log.debug("Extracted organization ID from JWT: {}", organizationId);
 
             String objectIdentifierString = Optional.ofNullable(
-                    jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getJwtTokenClaimName())
+                    jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName())
             ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.OBJECT_IDENTIFIER));
             log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifierString);
 
@@ -51,7 +51,7 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
                     .map(sourceApplicationAuthorityMappingService::createSourceApplicationAuthorities)
                     .ifPresent(authorities::addAll);
 
-            Set<String> roleValues = Set.copyOf(jwt.getClaimAsStringList(UserClaim.ROLES.getJwtTokenClaimName()));
+            Set<String> roleValues = Set.copyOf(jwt.getClaimAsStringList(UserClaim.ROLES.getTokenClaimName()));
             log.debug("Extracted roles from JWT: {}", roleValues);
             if (!roleValues.isEmpty()) {
                 Set<UserRole> filteredUserRoles = userRoleFilteringService.filter(roleValues, organizationId);
