@@ -29,7 +29,7 @@ class SourceApplicationAuthorizationServiceTest {
     }
 
     @Test
-    void givenSingleSourceApplicationIdAuthorityShouldThrowException() {
+    void givenSingleSourceApplicationIdAuthorityShouldReturnSourceApplicationId() {
         Authentication authentication = mock(Authentication.class);
         Collection<? extends GrantedAuthority> authorities = mock(Collection.class);
         Mockito.<Collection<? extends GrantedAuthority>>when(authentication.getAuthorities())

@@ -43,28 +43,32 @@ class UserJwtConverterTest {
     private Jwt jwt;
 
     @Test
-    void givenNoOrganizationIdClaimShouldThrowIllegalArgumentException() {
+    void givenNoOrganizationIdClaimShouldReturnJwtAuthenticationTokenWithAuthenticatedFalse() {
         when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn(null);
 
         StepVerifier.create(converter.convert(jwt))
-                .expectErrorSatisfies(throwable -> {
-                    assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
-                    assertThat(throwable.getMessage()).isEqualTo("Missing Claim: " + UserClaim.ORGANIZATION_ID);
+                .assertNext(authentication -> {
+                    assertThat(authentication).isInstanceOf(JwtAuthenticationToken.class);
+                    assertThat(authentication.getAuthorities()).isEmpty();
+                    assertThat(authentication.isAuthenticated()).isFalse();
                 })
+                .expectComplete()
                 .verify();
     }
 
     @Test
-    void givenNoObjectIdentifierClaimShouldThrowIllegalArgumentException() {
+    void givenNoObjectIdentifierClaimShouldReturnJwtAuthenticationTokenWithAuthenticatedFalse() {
         when(jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName()))
                 .thenReturn("testOrganizationId");
 
         StepVerifier.create(converter.convert(jwt))
-                .expectErrorSatisfies(throwable -> {
-                    assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
-                    assertThat(throwable.getMessage()).isEqualTo("Missing Claim: " + UserClaim.OBJECT_IDENTIFIER);
+                .assertNext(authentication -> {
+                    assertThat(authentication).isInstanceOf(JwtAuthenticationToken.class);
+                    assertThat(authentication.getAuthorities()).isEmpty();
+                    assertThat(authentication.isAuthenticated()).isFalse();
                 })
+                .expectComplete()
                 .verify();
     }
 

@@ -10,9 +10,9 @@ fint:
 
           internal:
             enabled: true
-            authorized-org-id-role-pairs-json: "{\"domain-with-admin-and-dev-access.no\":[\"ADMIN\", \"DEVELOPER\"],\"domain-with-user-access.no\":[\"USER\", \"ADMIN\", \"DEVELOPER\"]}"
+            authorized-org-id-role-pairs-json: "{\"domain-with-admin-and-dev-access.no\":[\"ADMIN\", \"DEVELOPER\"],\"domain-with-all-user-access.no\":[\"USER\", \"ADMIN\", \"DEVELOPER\"]}"
 
           internal-client:
             enabled: true
             authorized-client-ids:
-                - "9e8118f3-9bc0-4f00-8675-c04bf8fe2494"
+              - "9e8118f3-9bc0-4f00-8675-c04bf8fe2494"

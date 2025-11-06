@@ -1,4 +1,4 @@
-package no.fintlabs.resourceserver.integration;
+package no.fintlabs.resourceserver.integration.parameters;
 
 import lombok.Getter;
 import no.fintlabs.resourceserver.integration.utils.TokenWrapper;
@@ -9,29 +9,25 @@ import java.util.StringJoiner;
 
 @Getter
 public class IntegrationTestParameters {
-    String description;
     String path;
     TokenWrapper tokenWrapper;
     HttpStatus expectedResponseHttpStatus;
     Set<String> expectedAuthorities;
 
     public IntegrationTestParameters(
-            String description,
             String path,
             TokenWrapper tokenWrapper,
             HttpStatus expectedResponseHttpStatus
     ) {
-        this(description, path, tokenWrapper, expectedResponseHttpStatus, null);
+        this(path, tokenWrapper, expectedResponseHttpStatus, null);
     }
 
     public IntegrationTestParameters(
-            String description,
             String path,
             TokenWrapper tokenWrapper,
             HttpStatus expectedResponseHttpStatus,
             Set<String> expectedAuthorities
     ) {
-        this.description = description;
         this.path = path;
         this.tokenWrapper = tokenWrapper;
         this.expectedResponseHttpStatus = expectedResponseHttpStatus;

@@ -72,7 +72,10 @@ public class UserPermissionConsumerConfiguration {
                                 .build()
 
                 )
-        ).createContainer(EntityTopicNameParameters.builder().resourceName("userpermission").build());
+        ).createContainer(
+                EntityTopicNameParameters.builder()
+                        .resourceName("userpermission").build()
+        );
     }
 
 }

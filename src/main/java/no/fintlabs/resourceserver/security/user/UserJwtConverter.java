@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,15 +31,15 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     @Nonnull
     public Mono<AbstractAuthenticationToken> convert(@Nonnull Jwt jwt) {
         try {
-            String organizationId = Optional.ofNullable(
-                    jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName())
-            ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.ORGANIZATION_ID));
+            String organizationId = jwt.getClaimAsString(UserClaim.ORGANIZATION_ID.getTokenClaimName());
             log.debug("Extracted organization ID from JWT: {}", organizationId);
 
-            String objectIdentifierString = Optional.ofNullable(
-                    jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName())
-            ).orElseThrow(() -> new IllegalArgumentException("Missing Claim: " + UserClaim.OBJECT_IDENTIFIER));
+            String objectIdentifierString = jwt.getClaimAsString(UserClaim.OBJECT_IDENTIFIER.getTokenClaimName());
             log.debug("Extracted objectIdentifier from JWT: {}", objectIdentifierString);
+
+            if (organizationId == null || objectIdentifierString == null) {
+                return Mono.just(new JwtAuthenticationToken(jwt));
+            }
 
             UUID objectIdentifier = UUID.fromString(objectIdentifierString);
 
