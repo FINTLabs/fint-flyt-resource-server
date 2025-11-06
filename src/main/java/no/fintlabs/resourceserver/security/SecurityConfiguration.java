@@ -4,16 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheConfiguration;
 import no.fintlabs.resourceserver.UrlPaths;
-import no.fintlabs.resourceserver.security.client.InternalClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.internal.InternalClientAuthorityMappingService;
+import no.fintlabs.resourceserver.security.client.internal.InternalClientJwtConverter;
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
 import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationJwtConverter;
 import no.fintlabs.resourceserver.security.properties.ExternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.fintlabs.resourceserver.security.properties.InternalClientApiSecurityProperties;
-import no.fintlabs.resourceserver.security.user.RoleHierarchyService;
-import no.fintlabs.resourceserver.security.user.UserJwtConverter;
-import no.fintlabs.resourceserver.security.user.UserRole;
-import no.fintlabs.resourceserver.security.user.UserRoleFilteringService;
-import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
+import no.fintlabs.resourceserver.security.user.*;
+import no.fintlabs.resourceserver.security.user.permission.UserPermission;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
@@ -65,15 +64,15 @@ public class SecurityConfiguration {
             FintCache<UUID, UserPermission> userPermissionCache,
             UserRoleFilteringService userRoleFilteringService,
             SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService,
-            RoleHierarchyService roleHierarchyService,
-            RoleAuthorityMappingService roleAuthorityMappingService
+            UserRoleHierarchyService userRoleHierarchyService,
+            UserRoleAuthorityMappingService userRoleAuthorityMappingService
     ) {
         return new UserJwtConverter(
                 userPermissionCache,
                 userRoleFilteringService,
                 sourceApplicationAuthorityMappingService,
-                roleHierarchyService,
-                roleAuthorityMappingService
+                userRoleHierarchyService,
+                userRoleAuthorityMappingService
         );
     }
 
@@ -108,7 +107,7 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             WebFluxProperties props,
             UserJwtConverter userJwtConverter,
-            RoleAuthorityMappingService roleAuthorityMappingService
+            UserRoleAuthorityMappingService userRoleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
@@ -116,7 +115,7 @@ public class SecurityConfiguration {
                 UrlPaths.INTERNAL_ADMIN_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAuthority(
-                        roleAuthorityMappingService.createRoleAuthorityString(UserRole.ADMIN)
+                        userRoleAuthorityMappingService.createRoleAuthorityString(UserRole.ADMIN)
                 )
         );
     }
@@ -128,7 +127,7 @@ public class SecurityConfiguration {
             ServerHttpSecurity http,
             WebFluxProperties props,
             UserJwtConverter userJwtConverter,
-            RoleAuthorityMappingService roleAuthorityMappingService
+            UserRoleAuthorityMappingService userRoleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
@@ -136,7 +135,7 @@ public class SecurityConfiguration {
                 UrlPaths.INTERNAL_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAuthority(
-                        roleAuthorityMappingService.createRoleAuthorityString(UserRole.USER)
+                        userRoleAuthorityMappingService.createRoleAuthorityString(UserRole.USER)
                 )
         );
     }
@@ -149,7 +148,7 @@ public class SecurityConfiguration {
             WebFluxProperties props,
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
             InternalClientJwtConverter internalClientJwtConverter,
-            ClientAuthorityMappingService clientAuthorityMappingService
+            InternalClientAuthorityMappingService internalClientAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
@@ -157,7 +156,7 @@ public class SecurityConfiguration {
                 UrlPaths.INTERNAL_CLIENT_API,
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
-                        clientAuthorityMappingService.createInternalClientIdAuthorityStrings(
+                        internalClientAuthorityMappingService.createInternalClientIdAuthorityStrings(
                                 internalClientApiSecurityProperties.getAuthorizedClientIds()
                         ).toArray(new String[0])
                 )

@@ -1,7 +1,7 @@
 package no.fintlabs.resourceserver;
 
 import no.fintlabs.resourceserver.security.SecurityConfiguration;
-import no.fintlabs.resourceserver.security.user.userpermission.UserPermissionConsumerConfiguration;
+import no.fintlabs.resourceserver.security.user.permission.UserPermissionConsumerConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;

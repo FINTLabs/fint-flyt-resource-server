@@ -1,6 +1,5 @@
 package no.fintlabs.resourceserver.security.client.sourceapplication;
 
-import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;

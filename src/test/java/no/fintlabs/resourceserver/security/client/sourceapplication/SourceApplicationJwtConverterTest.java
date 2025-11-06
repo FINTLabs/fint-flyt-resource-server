@@ -1,6 +1,5 @@
 package no.fintlabs.resourceserver.security.client.sourceapplication;
 
-import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;

@@ -4,9 +4,8 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.cache.FintCache;
-import no.fintlabs.resourceserver.security.RoleAuthorityMappingService;
-import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
-import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
+import no.fintlabs.resourceserver.security.user.permission.UserPermission;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,8 +24,8 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     private final FintCache<UUID, UserPermission> userPermissionCache;
     private final UserRoleFilteringService userRoleFilteringService;
     private final SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
-    private final RoleHierarchyService roleHierarchyService;
-    private final RoleAuthorityMappingService roleAuthorityMappingService;
+    private final UserRoleHierarchyService userRoleHierarchyService;
+    private final UserRoleAuthorityMappingService userRoleAuthorityMappingService;
 
     @Nonnull
     public Mono<AbstractAuthenticationToken> convert(@Nonnull Jwt jwt) {
@@ -54,8 +53,8 @@ public class UserJwtConverter implements Converter<Jwt, Mono<AbstractAuthenticat
             log.debug("Extracted roles from JWT: {}", roleValues);
             if (!roleValues.isEmpty()) {
                 Set<UserRole> filteredUserRoles = userRoleFilteringService.filter(roleValues, organizationId);
-                Set<UserRole> providedAndImpliedRoles = roleHierarchyService.getProvidedAndImpliedRoles(filteredUserRoles);
-                authorities.addAll(roleAuthorityMappingService.createRoleAuthorities(providedAndImpliedRoles));
+                Set<UserRole> providedAndImpliedRoles = userRoleHierarchyService.getProvidedAndImpliedRoles(filteredUserRoles);
+                authorities.addAll(userRoleAuthorityMappingService.createRoleAuthorities(providedAndImpliedRoles));
             }
             return Mono.just(new JwtAuthenticationToken(jwt, authorities));
         } catch (Exception e) {

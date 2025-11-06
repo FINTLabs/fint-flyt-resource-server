@@ -1,9 +1,8 @@
 package no.fintlabs.resourceserver.security.user;
 
 import no.fintlabs.cache.FintCache;
-import no.fintlabs.resourceserver.security.RoleAuthorityMappingService;
-import no.fintlabs.resourceserver.security.SourceApplicationAuthorityMappingService;
-import no.fintlabs.resourceserver.security.user.userpermission.UserPermission;
+import no.fintlabs.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
+import no.fintlabs.resourceserver.security.user.permission.UserPermission;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,11 +31,11 @@ class UserJwtConverterTest {
     @Mock
     private SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService;
     @Mock
-    private RoleAuthorityMappingService roleAuthorityMappingService;
+    private UserRoleAuthorityMappingService userRoleAuthorityMappingService;
     @Mock
     private UserRoleFilteringService userRoleFilteringService;
     @Mock
-    private RoleHierarchyService roleHierarchyService;
+    private UserRoleHierarchyService userRoleHierarchyService;
     @InjectMocks
     private UserJwtConverter converter;
     @Mock
@@ -99,7 +98,7 @@ class UserJwtConverterTest {
         verify(userPermissionCache).getOptional(objectIdentifier);
         verify(jwt).getClaimAsStringList(UserClaim.ROLES.getTokenClaimName());
         verifyNoMoreInteractions(
-                roleAuthorityMappingService,
+                userRoleAuthorityMappingService,
                 sourceApplicationAuthorityMappingService,
                 userPermissionCache,
                 userRoleFilteringService
@@ -133,11 +132,11 @@ class UserJwtConverterTest {
         when(userRoleFilteringService.filter(roleClaims, "testOrganizationId"))
                 .thenReturn(Set.of(UserRole.ADMIN));
 
-        when(roleHierarchyService.getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN)))
+        when(userRoleHierarchyService.getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN)))
                 .thenReturn(Set.of(UserRole.ADMIN, UserRole.USER));
 
         GrantedAuthority roleAuthority = mock(GrantedAuthority.class);
-        when(roleAuthorityMappingService.createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER)))
+        when(userRoleAuthorityMappingService.createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER)))
                 .thenReturn(Set.of(roleAuthority));
 
         StepVerifier.create(converter.convert(jwt))
@@ -160,15 +159,15 @@ class UserJwtConverterTest {
         verify(userPermissionCache).getOptional(objectIdentifier);
         verify(jwt).getClaimAsStringList(UserClaim.ROLES.getTokenClaimName());
         verify(userRoleFilteringService).filter(roleClaims, "testOrganizationId");
-        verify(roleHierarchyService).getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN));
-        verify(roleAuthorityMappingService).createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER));
+        verify(userRoleHierarchyService).getProvidedAndImpliedRoles(Set.of(UserRole.ADMIN));
+        verify(userRoleAuthorityMappingService).createRoleAuthorities(Set.of(UserRole.ADMIN, UserRole.USER));
         verifyNoMoreInteractions(
                 userPermission,
-                roleAuthorityMappingService,
+                userRoleAuthorityMappingService,
                 sourceApplicationAuthorityMappingService,
                 userPermissionCache,
                 userRoleFilteringService,
-                roleHierarchyService
+                userRoleHierarchyService
         );
     }
 }
