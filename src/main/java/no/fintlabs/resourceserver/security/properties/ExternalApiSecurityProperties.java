@@ -15,6 +15,5 @@ import java.util.Set;
 @NoArgsConstructor
 public class ExternalApiSecurityProperties {
     private boolean enabled;
-    // TODO: Rename to authorizedSourceApplicationIds
-    private Set<Long> authorizedClientIds;
+    private Set<Long> authorizedSourceApplicationIds;
 }

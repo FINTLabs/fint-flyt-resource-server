@@ -5,7 +5,7 @@ fint:
         api:
           external:
             enabled: true
-            authorized-client-ids:
+            authorized-source-application-ids:
               - 1
 
           internal:

@@ -181,7 +181,7 @@ public class SecurityConfiguration {
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
                         sourceApplicationAuthorityMappingService.createSourceApplicationAuthorityStrings(
-                                externalApiSecurityProperties.getAuthorizedClientIds()
+                                externalApiSecurityProperties.getAuthorizedSourceApplicationIds()
                         ).toArray(new String[0])
                 )
 
