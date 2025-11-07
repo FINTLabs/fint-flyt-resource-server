@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
-// TODO 05/11/2025 eivindmorch: Rename to personalRole?
 @Getter
 @AllArgsConstructor
 public enum UserRole {

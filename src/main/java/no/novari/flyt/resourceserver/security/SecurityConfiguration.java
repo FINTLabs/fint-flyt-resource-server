@@ -216,11 +216,13 @@ public class SecurityConfiguration {
         );
     }
 
-    private SecurityWebFilterChain createFilterChain(ServerHttpSecurity http,
-                                                     WebFluxProperties props,
-                                                     String path,
-                                                     Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
-                                                     ReactiveAuthorizationManager<AuthorizationContext> manager) {
+    private SecurityWebFilterChain createFilterChain(
+            ServerHttpSecurity http,
+            WebFluxProperties props,
+            String path,
+            Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
+            ReactiveAuthorizationManager<AuthorizationContext> manager
+    ) {
         http.securityMatcher(matcherFor(path, props))
                 .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
         return http.oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))

@@ -18,7 +18,6 @@ public class SourceApplicationAuthorizationService {
         this.authorityMappingService = authorityMappingService;
     }
 
-    // TODO 21/10/2025 eivindmorch: Fix. Should be part of lib API.
     public Long getSourceApplicationId(Authentication authentication) {
         Set<Long> sourceApplicationIds = authorityMappingService.extractLongValues(
                 AuthorityPrefix.SOURCE_APPLICATION_ID,
