@@ -1,6 +1,6 @@
 fint:
-  org-id: fintlabs.no
-  application-id: fint-flyt-resource-server-test
+  org-id: novari.no
+  application-id: novari-flyt-resource-server-test
 spring:
   security:
     oauth2:
