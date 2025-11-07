@@ -15,7 +15,6 @@ import no.novari.flyt.resourceserver.security.user.*;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermission;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,10 +30,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
-import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -90,11 +86,11 @@ public class SecurityConfiguration {
         return new ExternalApiSecurityProperties();
     }
 
-
     @Order(0)
     @Bean
-    SecurityWebFilterChain tenantActuatorSecurityFilterChain(ServerHttpSecurity http, WebFluxProperties props) {
-        return http.securityMatcher(matcherFor("/actuator", props))
+    SecurityWebFilterChain tenantActuatorSecurityFilterChain(ServerHttpSecurity http) {
+        return http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/**"))
                 .authorizeExchange(spec -> spec.anyExchange().permitAll())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
@@ -105,13 +101,11 @@ public class SecurityConfiguration {
     @ConditionalOnBean(UserJwtConverter.class)
     SecurityWebFilterChain internalAdminApiFilterChain(
             ServerHttpSecurity http,
-            WebFluxProperties props,
             UserJwtConverter userJwtConverter,
             UserRoleAuthorityMappingService userRoleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
-                props,
                 UrlPaths.INTERNAL_ADMIN_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAuthority(
@@ -125,13 +119,11 @@ public class SecurityConfiguration {
     @ConditionalOnBean(InternalApiSecurityProperties.class)
     SecurityWebFilterChain internalApiFilterChain(
             ServerHttpSecurity http,
-            WebFluxProperties props,
             UserJwtConverter userJwtConverter,
             UserRoleAuthorityMappingService userRoleAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
-                props,
                 UrlPaths.INTERNAL_API,
                 userJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAuthority(
@@ -145,14 +137,12 @@ public class SecurityConfiguration {
     @ConditionalOnBean(InternalClientApiSecurityProperties.class)
     SecurityWebFilterChain internalClientApiFilterChain(
             ServerHttpSecurity http,
-            WebFluxProperties props,
             InternalClientApiSecurityProperties internalClientApiSecurityProperties,
             InternalClientJwtConverter internalClientJwtConverter,
             InternalClientAuthorityMappingService internalClientAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
-                props,
                 UrlPaths.INTERNAL_CLIENT_API,
                 internalClientJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
@@ -168,14 +158,12 @@ public class SecurityConfiguration {
     @ConditionalOnBean(ExternalApiSecurityProperties.class)
     SecurityWebFilterChain externalApiFilterChainTest(
             ServerHttpSecurity http,
-            WebFluxProperties props,
             ExternalApiSecurityProperties externalApiSecurityProperties,
             SourceApplicationJwtConverter sourceApplicationJwtConverter,
             SourceApplicationAuthorityMappingService sourceApplicationAuthorityMappingService
     ) {
         return createFilterChain(
                 http,
-                props,
                 UrlPaths.EXTERNAL_API,
                 sourceApplicationJwtConverter,
                 AuthorityReactiveAuthorizationManager.hasAnyAuthority(
@@ -196,36 +184,18 @@ public class SecurityConfiguration {
                 .build();
     }
 
-    // TODO 04/11/2025 eivindmorch: Remove?
-    private ServerWebExchangeMatcher matcherFor(String path, WebFluxProperties props) {
-        String normalized = path.startsWith("/") ? path : "/" + path;
-        ServerWebExchangeMatcher plain = new PathPatternParserServerWebExchangeMatcher(normalized + "/**");
-
-        String base = props.getBasePath();
-        if (!StringUtils.hasText(base)) {
-            return plain;
-        }
-
-        String prefixed = StringUtils.trimTrailingCharacter(
-                (base.startsWith("/") ? base : "/" + base), '/'
-        ) + normalized + "/**";
-
-        return new OrServerWebExchangeMatcher(
-                plain,
-                new PathPatternParserServerWebExchangeMatcher(prefixed)
-        );
-    }
-
     private SecurityWebFilterChain createFilterChain(
             ServerHttpSecurity http,
-            WebFluxProperties props,
             String path,
             Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
             ReactiveAuthorizationManager<AuthorizationContext> manager
     ) {
-        http.securityMatcher(matcherFor(path, props))
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION);
-        return http.oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
+        return http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**"))
+                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(converter))
+                )
                 .authorizeExchange(exchange -> exchange.anyExchange().access(manager))
                 .build();
     }
