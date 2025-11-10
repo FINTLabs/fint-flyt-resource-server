@@ -21,22 +21,19 @@ public class SecurityWebFilterChainFactoryService {
             Converter<Jwt, Mono<AbstractAuthenticationToken>> converter,
             ReactiveAuthorizationManager<AuthorizationContext> manager
     ) {
-        return http
+        return addCommonConfig(http)
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**"))
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(converter))
                 )
                 .authorizeExchange(exchange -> exchange.anyExchange().access(manager))
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 
     public SecurityWebFilterChain permitAll(ServerHttpSecurity http, String path) {
-        return http
+        return addCommonConfig(http)
                 .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**"))
                 .authorizeExchange(spec -> spec.anyExchange().permitAll())
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 
@@ -45,11 +42,16 @@ public class SecurityWebFilterChainFactoryService {
     }
 
     public SecurityWebFilterChain denyAll(ServerHttpSecurity http) {
+        return addCommonConfig(http)
+                .authorizeExchange(exchange -> exchange.anyExchange().denyAll())
+                .build();
+    }
+
+    private ServerHttpSecurity addCommonConfig(ServerHttpSecurity http) {
         return http
                 .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-                .authorizeExchange(exchange -> exchange.anyExchange().denyAll())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable);
     }
 
 }
