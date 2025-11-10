@@ -5,11 +5,9 @@ import no.novari.flyt.resourceserver.security.AuthorityPrefix;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.exceptions.MultipleSourceApplicationIdsException;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.exceptions.NoSourceApplicationIdException;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
 public class SourceApplicationAuthorizationService {
 
     private final AuthorityMappingService authorityMappingService;

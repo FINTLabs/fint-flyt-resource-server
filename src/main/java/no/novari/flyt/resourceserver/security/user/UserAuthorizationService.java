@@ -4,12 +4,10 @@ import no.novari.flyt.resourceserver.security.AuthorityMappingService;
 import no.novari.flyt.resourceserver.security.AuthorityPrefix;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Set;
 
-@Service
 public class UserAuthorizationService {
 
     private final AuthorityMappingService authorityMappingService;

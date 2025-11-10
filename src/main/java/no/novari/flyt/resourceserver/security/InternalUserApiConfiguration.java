@@ -14,17 +14,17 @@ import no.novari.flyt.resourceserver.security.user.UserRoleFilteringService;
 import no.novari.flyt.resourceserver.security.user.UserRoleHierarchyService;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermission;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermissionCachingListenerFactory;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import java.time.Duration;
 import java.util.UUID;
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(
         prefix = "novari.flyt.resource-server.security.api",
         value = "internal.enabled",

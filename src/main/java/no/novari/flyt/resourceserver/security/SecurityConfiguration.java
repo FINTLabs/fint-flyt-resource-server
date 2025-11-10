@@ -10,10 +10,10 @@ import no.novari.flyt.resourceserver.security.properties.InternalClientApiSecuri
 import no.novari.flyt.resourceserver.security.user.UserJwtConverter;
 import no.novari.flyt.resourceserver.security.user.UserRole;
 import no.novari.flyt.resourceserver.security.user.UserRoleAuthorityMappingService;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -21,7 +21,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @EnableWebFluxSecurity
-@Configuration
+@AutoConfiguration
 public class SecurityConfiguration {
 
     @Order(0)
