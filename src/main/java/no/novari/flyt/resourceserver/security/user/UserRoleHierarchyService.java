@@ -1,13 +1,10 @@
 package no.novari.flyt.resourceserver.security.user;
 
-import org.springframework.stereotype.Service;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
 public class UserRoleHierarchyService {
 
     private static final Map<UserRole, Set<UserRole>> IMPLIED_ROLES_PER_ROLE = Map.of(

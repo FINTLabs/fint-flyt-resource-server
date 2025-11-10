@@ -15,8 +15,10 @@ public class UserPermission {
     private Set<Long> sourceApplicationIds;
 
     @JsonCreator
-    public UserPermission(@JsonProperty("objectIdentifier") UUID objectIdentifier,
-                          @JsonProperty("sourceApplicationIds") Set<Long> sourceApplicationIds) {
+    public UserPermission(
+            @JsonProperty("objectIdentifier") UUID objectIdentifier,
+            @JsonProperty("sourceApplicationIds") Set<Long> sourceApplicationIds
+    ) {
         this.objectIdentifier = objectIdentifier;
         this.sourceApplicationIds = sourceApplicationIds;
     }

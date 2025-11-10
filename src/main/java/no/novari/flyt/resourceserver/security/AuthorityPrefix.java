@@ -1,10 +1,11 @@
 package no.novari.flyt.resourceserver.security;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AuthorityPrefix {
     ORG_ID("ORG_ID"),
     ROLE("ROLE"),

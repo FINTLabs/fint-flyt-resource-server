@@ -1,5 +1,6 @@
 package no.novari.flyt.resourceserver.security.user;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.toMap;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum UserRole {
     USER("https://role-catalog.vigoiks.no/vigo/flyt/user"),
     DEVELOPER("https://role-catalog.vigoiks.no/vigo/flyt/developer"),

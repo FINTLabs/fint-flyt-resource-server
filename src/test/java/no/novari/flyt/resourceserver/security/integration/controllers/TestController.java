@@ -10,11 +10,9 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static no.novari.flyt.resourceserver.UrlPaths.INTERNAL_API;
-
 @RestController
-@RequestMapping(INTERNAL_API + "/dummy")
-public class InternalApiTestController {
+@RequestMapping("/**")
+public class TestController {
 
     @GetMapping
     public Mono<Set<String>> getDummy(Authentication authentication) {

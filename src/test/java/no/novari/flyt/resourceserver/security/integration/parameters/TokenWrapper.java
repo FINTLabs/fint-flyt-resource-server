@@ -1,4 +1,4 @@
-package no.novari.flyt.resourceserver.security.integration.utils;
+package no.novari.flyt.resourceserver.security.integration.parameters;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

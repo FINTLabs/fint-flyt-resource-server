@@ -8,42 +8,18 @@ import no.fintlabs.kafka.consuming.ListenerConfiguration;
 import no.fintlabs.kafka.consuming.ParameterizedListenerContainerFactoryService;
 import no.fintlabs.kafka.topic.name.EntityTopicNameParameters;
 import no.fintlabs.kafka.topic.name.TopicNamePrefixParameters;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import java.util.UUID;
 
-
-@Configuration
-@Import(
-        {
-                ParameterizedListenerContainerFactoryService.class,
-                ErrorHandlerFactory.class,
-                UserPermissionCacheConfiguration.class
-        }
-)
 @Slf4j
-public class UserPermissionConsumerConfiguration {
-    private final ParameterizedListenerContainerFactoryService containerFactoryService;
-    private final FintCache<UUID, UserPermission> userPermissionCache;
-    private final ErrorHandlerFactory errorHandlerFactory;
+public class UserPermissionCachingListenerFactory {
 
-    public UserPermissionConsumerConfiguration(
+    public ConcurrentMessageListenerContainer<String, UserPermission> create(
             ParameterizedListenerContainerFactoryService containerFactoryService,
             FintCache<UUID, UserPermission> userPermissionCache,
             ErrorHandlerFactory errorHandlerFactory
     ) {
-        this.containerFactoryService = containerFactoryService;
-        this.userPermissionCache = userPermissionCache;
-        this.errorHandlerFactory = errorHandlerFactory;
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "fint.flyt.resource-server.user-permissions-consumer.enabled", havingValue = "true")
-    ConcurrentMessageListenerContainer<String, UserPermission> createCacheConsumer() {
         return containerFactoryService.createBatchListenerContainerFactory(
                 UserPermission.class,
                 consumerRecords -> consumerRecords

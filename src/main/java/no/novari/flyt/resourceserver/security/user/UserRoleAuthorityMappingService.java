@@ -5,13 +5,11 @@ import no.novari.flyt.resourceserver.security.AuthorityMappingService;
 import no.novari.flyt.resourceserver.security.AuthorityPrefix;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
 @AllArgsConstructor
 public class UserRoleAuthorityMappingService {
 

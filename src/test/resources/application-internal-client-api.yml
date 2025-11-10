@@ -1,0 +1,9 @@
+novari:
+  flyt:
+    resource-server:
+      security:
+        api:
+          internal-client:
+            enabled: true
+            authorized-client-ids:
+              - "9e8118f3-9bc0-4f00-8675-c04bf8fe2494"
