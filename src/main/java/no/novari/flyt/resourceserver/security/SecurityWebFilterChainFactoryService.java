@@ -28,6 +28,27 @@ public class SecurityWebFilterChainFactoryService {
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(converter))
                 )
                 .authorizeExchange(exchange -> exchange.anyExchange().access(manager))
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .build();
+    }
+
+    public SecurityWebFilterChain permitAll(ServerHttpSecurity http, String path) {
+        return http
+                .securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**"))
+                .authorizeExchange(spec -> spec.anyExchange().permitAll())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .build();
+    }
+
+    public SecurityWebFilterChain denyAll(ServerHttpSecurity http, String path) {
+        return denyAll(http.securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**")));
+    }
+
+    public SecurityWebFilterChain denyAll(ServerHttpSecurity http) {
+        return http
+                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+                .authorizeExchange(exchange -> exchange.anyExchange().denyAll())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 

@@ -17,24 +17,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 
 @EnableWebFluxSecurity
 @Configuration
 public class SecurityConfiguration {
 
-
     @Order(0)
     @Bean
-    SecurityWebFilterChain tenantActuatorSecurityFilterChain(ServerHttpSecurity http) {
-        return http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/**"))
-                .authorizeExchange(spec -> spec.anyExchange().permitAll())
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
+    SecurityWebFilterChain actuatorSecurityFilterChain(
+            ServerHttpSecurity http,
+            SecurityWebFilterChainFactoryService securityWebFilterChainFactoryService
+    ) {
+        return securityWebFilterChainFactoryService.permitAll(http, "/actuator");
     }
 
     @Order(1)
@@ -78,8 +74,11 @@ public class SecurityConfiguration {
     @Order(1)
     @Bean
     @ConditionalOnMissingBean(InternalUserApiConfiguration.class)
-    SecurityWebFilterChain internalApiDisabledFilterChain(ServerHttpSecurity http) {
-        return denyAll(http, UrlPaths.INTERNAL_API);
+    SecurityWebFilterChain internalApiDisabledFilterChain(
+            ServerHttpSecurity http,
+            SecurityWebFilterChainFactoryService securityWebFilterChainFactoryService
+    ) {
+        return securityWebFilterChainFactoryService.denyAll(http, UrlPaths.INTERNAL_API);
     }
 
     @Order(3)
@@ -107,8 +106,11 @@ public class SecurityConfiguration {
     @Order(3)
     @Bean
     @ConditionalOnMissingBean(InternalClientApiConfiguration.class)
-    SecurityWebFilterChain internalClientApiDisabledFilterChain(ServerHttpSecurity http) {
-        return denyAll(http, UrlPaths.INTERNAL_CLIENT_API);
+    SecurityWebFilterChain internalClientApiDisabledFilterChain(
+            ServerHttpSecurity http,
+            SecurityWebFilterChainFactoryService securityWebFilterChainFactoryService
+    ) {
+        return securityWebFilterChainFactoryService.denyAll(http, UrlPaths.INTERNAL_CLIENT_API);
     }
 
     @Order(4)
@@ -136,19 +138,11 @@ public class SecurityConfiguration {
 
     @Order(5)
     @Bean
-    SecurityWebFilterChain globalFilterChain(ServerHttpSecurity http) {
-        return denyAll(http);
-    }
-
-    private SecurityWebFilterChain denyAll(ServerHttpSecurity http, String path) {
-        return denyAll(http.securityMatcher(new PathPatternParserServerWebExchangeMatcher(path + "/**")));
-    }
-
-    private SecurityWebFilterChain denyAll(ServerHttpSecurity http) {
-        return http
-                .addFilterBefore(new AuthorizationLogFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-                .authorizeExchange(exchange -> exchange.anyExchange().denyAll())
-                .build();
+    SecurityWebFilterChain globalFilterChain(
+            ServerHttpSecurity http,
+            SecurityWebFilterChainFactoryService securityWebFilterChainFactoryService
+    ) {
+        return securityWebFilterChainFactoryService.denyAll(http);
     }
 
 }
