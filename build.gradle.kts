@@ -40,7 +40,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("no.fintlabs:fint-kafka:5.0.0-rc-15")
+    implementation("no.novari:kafka:5.0.0-rc-16")
 
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("no.fintlabs:fint-flyt-cache:1.2.5")
