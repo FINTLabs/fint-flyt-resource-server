@@ -1,4 +1,4 @@
-fint:
+novari:
   cache:
     default-cache-entry-time-to-live-millis: 9223372036854775807
     defaultCacheHeapSize: 1000000

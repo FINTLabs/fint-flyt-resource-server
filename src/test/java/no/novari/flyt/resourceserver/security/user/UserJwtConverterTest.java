@@ -1,6 +1,6 @@
 package no.novari.flyt.resourceserver.security.user;
 
-import no.fintlabs.cache.FintCache;
+import no.novari.cache.FintCache;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermission;
 import org.junit.jupiter.api.Test;

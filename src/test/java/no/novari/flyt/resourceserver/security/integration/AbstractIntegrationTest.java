@@ -1,6 +1,6 @@
 package no.novari.flyt.resourceserver.security.integration;
 
-import no.fintlabs.cache.FintCache;
+import no.novari.cache.FintCache;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorization;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorizationRequestService;
 import no.novari.flyt.resourceserver.security.integration.parameters.ExpectedResult;

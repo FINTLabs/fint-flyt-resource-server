@@ -1,4 +1,4 @@
-fint:
+novari:
   org-id: novari.no
   application-id: flyt-resource-server-test
 spring:

@@ -43,7 +43,7 @@ dependencies {
     implementation("no.novari:kafka:5.0.0-rc-16")
 
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("no.fintlabs:fint-flyt-cache:1.2.5")
+    implementation("no.novari:flyt-cache:2.0.0-rc-2")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

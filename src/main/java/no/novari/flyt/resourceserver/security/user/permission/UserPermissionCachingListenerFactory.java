@@ -1,13 +1,13 @@
 package no.novari.flyt.resourceserver.security.user.permission;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.cache.FintCache;
-import no.fintlabs.kafka.consuming.ErrorHandlerConfiguration;
-import no.fintlabs.kafka.consuming.ErrorHandlerFactory;
-import no.fintlabs.kafka.consuming.ListenerConfiguration;
-import no.fintlabs.kafka.consuming.ParameterizedListenerContainerFactoryService;
-import no.fintlabs.kafka.topic.name.EntityTopicNameParameters;
-import no.fintlabs.kafka.topic.name.TopicNamePrefixParameters;
+import no.novari.cache.FintCache;
+import no.novari.kafka.consuming.ErrorHandlerConfiguration;
+import no.novari.kafka.consuming.ErrorHandlerFactory;
+import no.novari.kafka.consuming.ListenerConfiguration;
+import no.novari.kafka.consuming.ParameterizedListenerContainerFactoryService;
+import no.novari.kafka.topic.name.EntityTopicNameParameters;
+import no.novari.kafka.topic.name.TopicNamePrefixParameters;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import java.util.UUID;

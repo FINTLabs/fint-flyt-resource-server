@@ -1,11 +1,11 @@
 package no.novari.flyt.resourceserver.security;
 
-import no.fintlabs.cache.FintCache;
-import no.fintlabs.cache.FintCacheConfiguration;
-import no.fintlabs.cache.FintCacheManager;
-import no.fintlabs.cache.FintCacheOptions;
-import no.fintlabs.kafka.consuming.ErrorHandlerFactory;
-import no.fintlabs.kafka.consuming.ParameterizedListenerContainerFactoryService;
+import no.novari.cache.FintCache;
+import no.novari.cache.FintCacheConfiguration;
+import no.novari.cache.FintCacheManager;
+import no.novari.cache.FintCacheOptions;
+import no.novari.kafka.consuming.ErrorHandlerFactory;
+import no.novari.kafka.consuming.ParameterizedListenerContainerFactoryService;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
 import no.novari.flyt.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.novari.flyt.resourceserver.security.user.UserJwtConverter;

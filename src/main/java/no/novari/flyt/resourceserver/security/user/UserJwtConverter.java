@@ -3,7 +3,7 @@ package no.novari.flyt.resourceserver.security.user;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.cache.FintCache;
+import no.novari.cache.FintCache;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermission;
 import org.springframework.core.convert.converter.Converter;
