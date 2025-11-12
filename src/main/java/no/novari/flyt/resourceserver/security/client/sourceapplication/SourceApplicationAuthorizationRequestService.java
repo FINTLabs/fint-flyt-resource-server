@@ -22,7 +22,7 @@ public class SourceApplicationAuthorizationRequestService {
     private final RequestTemplate<String, SourceApplicationAuthorization> requestTemplate;
 
     public SourceApplicationAuthorizationRequestService(
-            @Value("${fint.kafka.application-id}") String applicationId,
+            @Value("${novari.kafka.application-id}") String applicationId,
             RequestTemplateFactory requestTemplateFactory,
             ReplyTopicService replyTopicService
     ) {
