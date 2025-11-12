@@ -1,3 +1,7 @@
+fint:
+  kafka:
+    enable-ssl: false
+
 novari:
   org-id: novari.no
   application-id: flyt-resource-server-test
