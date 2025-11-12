@@ -36,13 +36,11 @@ dependencyManagement {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("no.novari:kafka:5.0.0-rc-16")
-
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.kafka:spring-kafka")
+
+    implementation("no.novari:kafka:5.0.0-rc-18")
     implementation("no.novari:flyt-cache:2.0.0-rc-2")
 
     compileOnly("org.projectlombok:lombok")
