@@ -52,7 +52,7 @@ public class UserPermissionCachingListenerFactory {
         ).createContainer(
                 EntityTopicNameParameters.builder()
                         .topicNamePrefixParameters(TopicNamePrefixParameters
-                                .builder()
+                                .stepBuilder()
                                 .orgIdApplicationDefault()
                                 .domainContextApplicationDefault()
                                 .build()
