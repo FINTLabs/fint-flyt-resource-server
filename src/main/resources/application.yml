@@ -1,7 +1,7 @@
 novari:
   cache:
-    default-cache-entry-time-to-live-millis: 9223372036854775807
-    defaultCacheHeapSize: 1000000
+    default-cache-entry-time-to-live: "3650" # 10 years
+
 spring:
   output:
     ansi:
