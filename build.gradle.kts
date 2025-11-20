@@ -34,11 +34,22 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+
     implementation("org.springframework.kafka:spring-kafka")
+
+    implementation("org.springframework.security:spring-security-oauth2-client")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework.security:spring-security-web")
+
+    // Added instead of multiple Spring Boot starters
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.projectreactor:reactor-core")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.slf4j:slf4j-api")
 
     implementation("no.novari:kafka:5.0.0-rc-19")
     implementation("no.novari:flyt-cache:2.0.0-rc-2")
@@ -47,11 +58,13 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
 
-    testImplementation("org.springframework.kafka:spring-kafka-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("cglib:cglib-nodep:3.3.0")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.springframework.security:spring-security-test")
+
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
 }
