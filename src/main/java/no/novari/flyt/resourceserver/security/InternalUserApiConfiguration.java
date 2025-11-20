@@ -1,11 +1,8 @@
 package no.novari.flyt.resourceserver.security;
 
 import no.novari.cache.FintCache;
-import no.novari.cache.FintCacheConfiguration;
 import no.novari.cache.FintCacheManager;
 import no.novari.cache.FintCacheOptions;
-import no.novari.kafka.consuming.ErrorHandlerFactory;
-import no.novari.kafka.consuming.ParameterizedListenerContainerFactoryService;
 import no.novari.flyt.resourceserver.security.client.sourceapplication.SourceApplicationAuthorityMappingService;
 import no.novari.flyt.resourceserver.security.properties.InternalApiSecurityProperties;
 import no.novari.flyt.resourceserver.security.user.UserJwtConverter;
@@ -14,11 +11,12 @@ import no.novari.flyt.resourceserver.security.user.UserRoleFilteringService;
 import no.novari.flyt.resourceserver.security.user.UserRoleHierarchyService;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermission;
 import no.novari.flyt.resourceserver.security.user.permission.UserPermissionCachingListenerFactory;
+import no.novari.kafka.consuming.ErrorHandlerFactory;
+import no.novari.kafka.consuming.ParameterizedListenerContainerFactoryService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import java.time.Duration;
@@ -30,7 +28,6 @@ import java.util.UUID;
         value = "internal.enabled",
         havingValue = "true"
 )
-@Import(FintCacheConfiguration.class)
 public class InternalUserApiConfiguration {
 
     @Bean
