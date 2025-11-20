@@ -1,6 +1,6 @@
 novari:
   cache:
-    default-cache-entry-time-to-live: "3650" # 10 years
+    default-cache-entry-time-to-live: "3650d" # 10 years
 
 spring:
   output:
