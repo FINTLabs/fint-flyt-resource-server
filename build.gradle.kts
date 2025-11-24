@@ -43,8 +43,8 @@ dependencies {
     // Autoconfiguration support
     api("org.springframework.boot:spring-boot-autoconfigure")
 
-    implementation("no.novari:kafka:5.0.0-rc-21")
-    implementation("no.novari:flyt-cache:2.0.0-rc-2")
+    api("no.novari:kafka:5.0.0-rc-21")
+    api("no.novari:flyt-cache:2.0.0-rc-2")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
