@@ -40,6 +40,8 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-oauth2-client")
     api("org.springframework.boot:spring-boot-starter-cache")
 
+    api("org.springframework.security:spring-security-core")
+
     // Autoconfiguration support
     api("org.springframework.boot:spring-boot-autoconfigure")
 
