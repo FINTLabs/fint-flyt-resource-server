@@ -34,25 +34,16 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    // Exported to consumers
+    api("org.springframework.boot:spring-boot-starter-webflux")
+    api("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    api("org.springframework.boot:spring-boot-starter-oauth2-client")
+    api("org.springframework.boot:spring-boot-starter-cache")
 
-    implementation("org.springframework.kafka:spring-kafka")
+    // Autoconfiguration support
+    api("org.springframework.boot:spring-boot-autoconfigure")
 
-    implementation("org.springframework.security:spring-security-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-jose")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server")
-    implementation("org.springframework.security:spring-security-config")
-    implementation("org.springframework.security:spring-security-core")
-    implementation("org.springframework.security:spring-security-web")
-
-    // Added instead of multiple Spring Boot starters
-    implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("io.projectreactor:reactor-core")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.slf4j:slf4j-api")
-
-    implementation("no.novari:kafka:5.0.0-rc-20")
+    implementation("no.novari:kafka:5.0.0-rc-21")
     implementation("no.novari:flyt-cache:2.0.0-rc-2")
 
     compileOnly("org.projectlombok:lombok")
