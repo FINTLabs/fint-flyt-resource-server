@@ -35,6 +35,7 @@ dependencyManagement {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     implementation("org.springframework.kafka:spring-kafka")
 
@@ -51,7 +52,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.slf4j:slf4j-api")
 
-    implementation("no.novari:kafka:5.0.0-rc-19")
+    implementation("no.novari:kafka:5.0.0-rc-20")
     implementation("no.novari:flyt-cache:2.0.0-rc-2")
 
     compileOnly("org.projectlombok:lombok")

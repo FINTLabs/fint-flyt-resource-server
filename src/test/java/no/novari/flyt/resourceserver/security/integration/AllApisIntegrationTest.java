@@ -1,6 +1,5 @@
 package no.novari.flyt.resourceserver.security.integration;
 
-
 import no.novari.flyt.resourceserver.security.integration.parameters.TestParameters;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
