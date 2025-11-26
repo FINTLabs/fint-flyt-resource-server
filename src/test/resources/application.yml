@@ -1,6 +1,11 @@
 fint:
-  org-id: fintlabs.no
-  application-id: fint-flyt-resource-server-test
+  kafka:
+    enable-ssl: false
+
+novari:
+  org-id: novari.no
+  application-id: flyt-resource-server-test
+
 spring:
   security:
     oauth2:

@@ -1,10 +1,9 @@
-fint:
+novari:
   flyt:
     resource-server:
       security:
         api:
           internal-client:
             enabled: true
-            permit-all: false
             authorized-client-ids:
-              - 1234
+              - "9e8118f3-9bc0-4f00-8675-c04bf8fe2494"
