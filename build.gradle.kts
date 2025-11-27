@@ -46,7 +46,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-autoconfigure")
 
     api("no.novari:kafka:5.0.0")
-    api("no.novari:flyt-cache:2.0.0")
+    api("no.novari:flyt-cache:2.0.1")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
