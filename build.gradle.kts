@@ -2,7 +2,7 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id("org.springframework.boot") version "3.5.7" apply false
+    id("org.springframework.boot") version "3.5.9" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("maven-publish")
     id("java-library")
@@ -45,7 +45,7 @@ dependencies {
     // Autoconfiguration support
     api("org.springframework.boot:spring-boot-autoconfigure")
 
-    api("no.novari:kafka:5.0.0")
+    api("no.novari:kafka:6.0.0")
     api("no.novari:flyt-cache:2.0.0")
 
     compileOnly("org.projectlombok:lombok")
