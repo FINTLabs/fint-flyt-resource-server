@@ -1,9 +1,6 @@
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
+var springBootVersion = "3.5.9"
 
 plugins {
-    id("org.springframework.boot") version "3.5.7" apply false
-    id("io.spring.dependency-management") version "1.1.7"
     id("maven-publish")
     id("java-library")
     id("com.github.ben-manes.versions") version "0.53.0"
@@ -27,14 +24,14 @@ repositories {
     mavenCentral()
 }
 
-dependencyManagement {
-    imports {
-        mavenBom(SpringBootPlugin.BOM_COORDINATES)
-    }
-}
-
 dependencies {
     // Exported to consumers
+    api(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    compileOnly(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testAnnotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testCompileOnly(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+
     api("org.springframework.boot:spring-boot-starter-webflux")
     api("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     api("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -45,7 +42,7 @@ dependencies {
     // Autoconfiguration support
     api("org.springframework.boot:spring-boot-autoconfigure")
 
-    api("no.novari:kafka:5.0.0")
+    api("no.novari:kafka:6.0.0")
     api("no.novari:flyt-cache:2.0.0")
 
     compileOnly("org.projectlombok:lombok")
