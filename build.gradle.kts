@@ -1,4 +1,7 @@
-var springBootVersion = "3.5.9"
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.kotlin.dsl.named
+
+var springBootVersion = "3.5.10"
 
 plugins {
     id("maven-publish")
@@ -11,7 +14,7 @@ version = findProperty("version")?.toString() ?: "1.0-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
     withSourcesJar()
 }
@@ -39,11 +42,10 @@ dependencies {
 
     api("org.springframework.security:spring-security-core")
 
-    // Autoconfiguration support
     api("org.springframework.boot:spring-boot-autoconfigure")
 
     api("no.novari:kafka:6.0.0")
-    api("no.novari:flyt-cache:2.0.0")
+    api("no.novari:flyt-cache:2.1.0-rc-3")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -81,5 +83,18 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
         }
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return !isStable
+}
+
+tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
+    rejectVersionIf {
+        isNonStable(candidate.version)
     }
 }
