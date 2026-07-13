@@ -1,12 +1,12 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.kotlin.dsl.named
 
-var springBootVersion = "3.5.10"
+var springBootVersion = "3.5.16"
 
 plugins {
     id("maven-publish")
     id("java-library")
-    id("com.github.ben-manes.versions") version "0.53.0"
+    id("com.github.ben-manes.versions") version "0.54.0"
 }
 
 group = "no.novari"
@@ -44,7 +44,7 @@ dependencies {
 
     api("org.springframework.boot:spring-boot-autoconfigure")
 
-    api("no.novari:kafka:6.0.0")
+    api("no.novari:kafka:6.2.0")
     api("no.novari:flyt-cache:3.0.0")
 
     compileOnly("org.projectlombok:lombok")
