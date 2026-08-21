@@ -34,9 +34,9 @@ dependencies {
         }
     }
 
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.21.5"))
-    implementation(platform("org.apache.logging.log4j:log4j-bom:2.25.5"))
-    implementation(platform("io.netty:netty-bom:4.1.137.Final"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.2"))
+    implementation(platform("org.apache.logging.log4j:log4j-bom:2.26.1"))
+    implementation(platform("io.netty:netty-bom:4.2.17.Final"))
     // Exported to consumers
     api(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
