@@ -6,7 +6,7 @@ var springBootVersion = "3.5.16"
 plugins {
     id("maven-publish")
     id("java-library")
-    id("com.github.ben-manes.versions") version "0.61.0"
+    id("io.github.ben-manes.versions") version "0.61.0"
 }
 
 group = "no.novari"
