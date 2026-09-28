@@ -6,7 +6,7 @@ var springBootVersion = "3.5.16"
 plugins {
     id("maven-publish")
     id("java-library")
-    id("io.github.ben-manes.versions") version "0.61.0"
+    id("io.github.ben-manes.versions") version "0.64.0"
 }
 
 group = "no.novari"
@@ -29,14 +29,14 @@ repositories {
 
 dependencies {
     constraints {
-        implementation("at.yawk.lz4:lz4-java:1.11.2") {
+        implementation("at.yawk.lz4:lz4-java:1.11.3") {
             because("Fixes CVE-2026-59949 in the kafka-clients transitive dependency")
         }
     }
 
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.2"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.3"))
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.26.1"))
-    implementation(platform("io.netty:netty-bom:4.2.17.Final"))
+    implementation(platform("io.netty:netty-bom:4.2.18.Final"))
     // Exported to consumers
     api(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
