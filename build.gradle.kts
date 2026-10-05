@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     constraints {
-        implementation("at.yawk.lz4:lz4-java:1.11.3") {
+        implementation("at.yawk.lz4:lz4-java:1.12.0") {
             because("Fixes CVE-2026-59949 in the kafka-clients transitive dependency")
         }
     }
