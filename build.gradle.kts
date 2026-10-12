@@ -6,7 +6,7 @@ var springBootVersion = "3.5.16"
 plugins {
     id("maven-publish")
     id("java-library")
-    id("io.github.ben-manes.versions") version "0.64.0"
+    id("io.github.ben-manes.versions") version "0.65.0"
 }
 
 group = "no.novari"
@@ -36,7 +36,7 @@ dependencies {
 
     implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.3"))
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.26.1"))
-    implementation(platform("io.netty:netty-bom:4.2.18.Final"))
+    implementation(platform("io.netty:netty-bom:4.2.19.Final"))
     // Exported to consumers
     api(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
