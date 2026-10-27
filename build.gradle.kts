@@ -1,6 +1,10 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.gradle.kotlin.dsl.named
 
+buildscript {
+    configurations.classpath { resolutionStrategy.activateDependencyLocking() }
+}
+
 var springBootVersion = "3.5.16"
 
 plugins {
@@ -25,6 +29,10 @@ repositories {
         url = uri("https://repo.fintlabs.no/releases")
     }
     mavenCentral()
+}
+
+dependencyLocking {
+    lockAllConfigurations()
 }
 
 dependencies {
