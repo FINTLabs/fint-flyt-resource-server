@@ -62,7 +62,7 @@ dependencies {
 
     api("org.springframework.boot:spring-boot-autoconfigure")
 
-    api("no.novari:kafka:6.2.0")
+    api("no.novari:kafka:6.3.0")
     api("no.novari:flyt-cache:3.0.0")
 
     compileOnly("org.projectlombok:lombok")
